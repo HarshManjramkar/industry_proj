@@ -21,11 +21,11 @@ import streamlit as st
 
 from pmc_recon.ingest.crawler_service import CrawlerDemoService
 from pmc_recon.ingest.table_validator import LiveTableValidator
+from pmc_recon.intro_component import render_cinematic_intro_html
 from pmc_recon.reporting.evidence import EvidenceReporter
 from pmc_recon.storage.db import DatabaseEngine
 from pmc_recon.ui_components import (
     get_theme_css,
-    render_intro_video_walkthrough,
     render_radar_header,
     render_regal_banner,
 )
@@ -53,14 +53,33 @@ def parse_html_to_dataframe(html_str: str) -> pd.DataFrame:
 
 st.set_page_config(page_title="PMC Civic Reconciliation | Pune", page_icon="🏛️", layout="wide")
 st.markdown(get_theme_css(), unsafe_allow_html=True)
+
+# -------------------------------------------------------------------
+# CINEMATIC MOVIE-STYLE INTRO ON LOAD
+# -------------------------------------------------------------------
+if "intro_completed" not in st.session_state:
+    st.session_state.intro_completed = False
+
+if not st.session_state.intro_completed:
+    st.markdown(render_cinematic_intro_html(), unsafe_allow_html=True)
+    b_col1, b_col2, b_col3 = st.columns([0.25, 0.50, 0.25])
+    with b_col2:
+        if st.button("⚔️ ENTER FORENSIC COMMAND CENTER", type="primary", width="stretch"):
+            st.session_state.intro_completed = True
+            st.rerun()
+    st.stop()
+
+# -------------------------------------------------------------------
+# COMMAND CENTER COCKPIT
+# -------------------------------------------------------------------
 st.markdown(render_regal_banner(), unsafe_allow_html=True)
 
 db = DatabaseEngine()
 crawler_service = CrawlerDemoService(db=db)
 validator = LiveTableValidator()
 
-# Compact Command Ribbon & Civic Briefing Toggle
-nav_c1, nav_c2 = st.columns([0.80, 0.20])
+# Navigation Ribbon with Replay Intro trigger
+nav_c1, nav_c2 = st.columns([0.84, 0.16])
 with nav_c1:
     view = st.radio(
         "Navigation Hub:",
@@ -75,10 +94,9 @@ with nav_c1:
         label_visibility="collapsed"
     )
 with nav_c2:
-    show_briefing = st.toggle("🎬 Video Briefing", value=False)
-
-if show_briefing:
-    st.markdown(render_intro_video_walkthrough(), unsafe_allow_html=True)
+    if st.button("🎬 Movie Intro", width="stretch"):
+        st.session_state.intro_completed = False
+        st.rerun()
 
 PANE_HEIGHT = 580
 
@@ -303,11 +321,8 @@ else:
                     st.warning(res.error_message)
                 else:
                     st.success(f"Fetched {res.size_bytes:,} bytes | SHA-256: {res.content_hash[:16]}...")
-                    
-                    # Extract and display the live data table
                     live_df = parse_html_to_dataframe(res.payload_preview)
                     if live_df.empty:
-                        # Fallback to verified active tenders table if portal returned HTML header without table
                         live_df = parse_html_to_dataframe(MOCK_MAHATENDERS_HTML)
                     
                     st.markdown("##### 📋 Extracted Public Tenders Table:")
