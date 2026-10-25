@@ -7,7 +7,7 @@ import json
 import sqlite3
 from pathlib import Path
 from typing import Any, Dict, List, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 
 from pmc_recon.models.entities import RawDocument, TenderRecord, BudgetLine, ChangeEvent, EntityLink, Flag, ReviewDecision
 
@@ -147,7 +147,7 @@ class DatabaseEngine:
             conn.execute("""
             INSERT OR IGNORE INTO raw_documents (doc_id, run_id, storage_path, content_hash, size_bytes, fetched_at)
             VALUES (?, ?, ?, ?, ?, ?)
-            """, (raw_doc.doc_id, raw_doc.run_id, raw_doc.storage_path, raw_doc.content_hash, raw_doc.size_bytes, raw_doc.fetched_at))
+            """, (raw_doc.doc_id, raw_doc.run_id, raw_doc.storage_path, raw_doc.content_hash, raw_doc.size_bytes, raw_doc.fetched_at.isoformat()))
         return raw_doc
 
     def upsert_tender(self, tender: TenderRecord) -> Optional[ChangeEvent]:
@@ -198,7 +198,7 @@ class DatabaseEngine:
                     """, (tender.value_inr, str(tender.closing_date) if tender.closing_date else None,
                           tender.status.value, tender.corrigenda_count, tender.tender_id))
                     change_event = ChangeEvent(
-                        change_id=f"chg_mod_{tender.tender_id}_{datetime.utcnow().strftime('%Y%m%d%H%M%S')}",
+                        change_id=f"chg_mod_{tender.tender_id}_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}",
                         record_id=tender.tender_id,
                         record_type="tender",
                         change_type="modified",
@@ -216,7 +216,7 @@ class DatabaseEngine:
                 INSERT OR REPLACE INTO change_events (change_id, record_id, record_type, change_type, changed_fields_json, detected_at)
                 VALUES (?, ?, ?, ?, ?, ?)
                 """, (change_event.change_id, change_event.record_id, change_event.record_type,
-                      change_event.change_type.value, json.dumps(change_event.changed_fields), change_event.detected_at))
+                      change_event.change_type.value, json.dumps(change_event.changed_fields), change_event.detected_at.isoformat()))
 
         return change_event
 
@@ -239,7 +239,7 @@ class DatabaseEngine:
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """, (flag.flag_id, flag.rule_id, flag.title, flag.severity.value,
                   json.dumps(flag.evidence), json.dumps(flag.benign_explanations),
-                  flag.status.value, flag.created_at))
+                  flag.status.value, flag.created_at.isoformat()))
 
     def record_review(self, review: ReviewDecision) -> None:
         with self._get_connection() as conn:
@@ -247,5 +247,5 @@ class DatabaseEngine:
             INSERT INTO reviews (review_id, flag_id, reviewer, outcome, comment, reviewed_at)
             VALUES (?, ?, ?, ?, ?, ?)
             """, (review.review_id, review.flag_id, review.reviewer, review.outcome.value,
-                  review.comment, review.reviewed_at))
+                  review.comment, review.reviewed_at.isoformat()))
             conn.execute("UPDATE flags SET status = ? WHERE flag_id = ?", (review.outcome.value, review.flag_id))

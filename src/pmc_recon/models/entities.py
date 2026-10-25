@@ -2,10 +2,15 @@
 Complies with Article II of Project Constitution and Devang Manjramkar Flow.
 """
 
-from datetime import datetime, date
+from datetime import datetime, date, timezone
 from enum import Enum
 from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, Field, field_validator
+
+
+def current_utc_datetime() -> datetime:
+    """Return timezone-aware current UTC datetime."""
+    return datetime.now(timezone.utc)
 
 
 class AccessMethod(str, Enum):
@@ -50,7 +55,7 @@ class RawDocument(BaseModel):
     storage_path: str = Field(..., description="Relative filesystem storage path")
     content_hash: str = Field(..., min_length=64, max_length=64, description="SHA-256 hash of payload")
     size_bytes: int = Field(..., ge=0)
-    fetched_at: datetime = Field(default_factory=datetime.utcnow)
+    fetched_at: datetime = Field(default_factory=current_utc_datetime)
 
 
 class TenderStatus(str, Enum):
@@ -111,7 +116,7 @@ class ChangeEvent(BaseModel):
     record_type: str = Field(..., description="'tender' or 'budget_line'")
     change_type: ChangeType
     changed_fields: Dict[str, Any] = Field(default_factory=dict, description="Key -> {old_val, new_val}")
-    detected_at: datetime = Field(default_factory=datetime.utcnow)
+    detected_at: datetime = Field(default_factory=current_utc_datetime)
 
 
 class EntityLinkStatus(str, Enum):
@@ -153,7 +158,7 @@ class Flag(BaseModel):
     evidence: Dict[str, Any] = Field(..., description="Deterministic numbers, documents, diff traces")
     benign_explanations: List[str] = Field(..., min_length=1, description="List of innocent explanations to check")
     status: FlagStatus = Field(default=FlagStatus.OPEN)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=current_utc_datetime)
 
     @field_validator("title")
     @classmethod
@@ -171,4 +176,4 @@ class ReviewDecision(BaseModel):
     reviewer: str = Field(default="Client Reviewer", description="Human reviewer name")
     outcome: FlagStatus = Field(...)
     comment: str = Field(..., min_length=3, description="Review commentary explaining the decision")
-    reviewed_at: datetime = Field(default_factory=datetime.utcnow)
+    reviewed_at: datetime = Field(default_factory=current_utc_datetime)
