@@ -49,3 +49,5 @@ htmlcov/
 
 # BMAD Render cache
 _bmad/render/
+target/
+crates/**/target/

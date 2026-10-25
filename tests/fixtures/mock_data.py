@@ -9,6 +9,7 @@ MOCK_BUDGET_ROWS: List[Dict[str, Any]] = [
     {
         "budget_head_code": "RI11A101",
         "description_marathi": "पाणी पुरवठा वितरण व्यवस्था सक्षमीकरण (वाघोली, लोहगाव)",
+        "description_english": "Water supply distribution network strengthening Wagholi Lohegaon",
         "department": "Water Supply",
         "fiscal_year": "2025-26",
         "actual_amount_crore": 42.50,
@@ -18,6 +19,7 @@ MOCK_BUDGET_ROWS: List[Dict[str, Any]] = [
     {
         "budget_head_code": "RI11A102",
         "description_marathi": "नवीन समाविष्ट गावांसाठी जलशुद्धीकरण प्रकल्प व मुख्य जलवाहिनी",
+        "description_english": "Water treatment plant and transmission main for newly merged villages",
         "department": "Water Supply",
         "fiscal_year": "2025-26",
         "actual_amount_crore": 125.75,
@@ -27,6 +29,7 @@ MOCK_BUDGET_ROWS: List[Dict[str, Any]] = [
     {
         "budget_head_code": "EL05B201",
         "description_marathi": "विद्युत विभाग पथदिवे देखभाल दुरुस्ती",
+        "description_english": "Electrical department street light maintenance and repairs",
         "department": "Electrical",
         "fiscal_year": "2025-26",
         "actual_amount_crore": 80.90,

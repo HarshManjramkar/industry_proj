@@ -28,7 +28,7 @@ class EvidenceReporter:
         explanations = json.loads(row["benign_explanations_json"])
 
         dossier_lines = [
-            f"# Evidence Dossier: {row['flag_id']}",
+            f"# PMC PROCUREMENT RECONCILIATION AUDIT DOSSIER: {row['flag_id']}",
             f"**Rule:** {row['rule_id']} | **Severity:** {row['severity'].upper()} | **Status:** {row['status'].upper()}",
             f"**Created:** {row['created_at']}",
             "",

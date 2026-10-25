@@ -1,16 +1,50 @@
 rules:
+  # CWE-94 / Article III: Dynamic Code Execution
   - id: avoid-eval-and-dynamic-exec
     patterns:
       - pattern-either:
           - pattern: eval(...)
           - pattern: exec(...)
-    message: "Dynamic code execution via eval/exec is prohibited by Article III of Constitution."
+    message: "Dynamic code execution via eval/exec violates Article III of Constitution."
     languages: [python, javascript, typescript]
     severity: ERROR
 
+  # CWE-798: Hardcoded Credentials / Secrets
   - id: no-hardcoded-api-secrets
     patterns:
       - pattern-regex: "(?i)(api_key|secret|password|bearer|auth_token)\\s*=\\s*['\"][A-Za-z0-9_\\-]{16,}['\"]"
     message: "Hardcoded API secrets or tokens violate Article III of Constitution."
     languages: [python, javascript, typescript]
+    severity: ERROR
+
+  # CWE-89: SQL Injection Prevention
+  - id: sql-injection-parameterized-queries
+    patterns:
+      - pattern-either:
+          - pattern: $CONN.execute(f"...")
+          - pattern: $CONN.execute("..." % ...)
+          - pattern: $CONN.execute("...".format(...))
+    message: "CodeQL CWE-89: Unparameterized SQL query detected. Parameterized queries ('?') must be used."
+    languages: [python]
+    severity: ERROR
+
+  # CWE-327: Broken Cryptographic Algorithms (MD5 / SHA1)
+  - id: forbid-broken-hash-algorithms
+    patterns:
+      - pattern-either:
+          - pattern: hashlib.md5(...)
+          - pattern: hashlib.sha1(...)
+    message: "CodeQL CWE-327: MD5 and SHA1 are cryptographically broken. SHA-256 must be used for pre-image binding."
+    languages: [python]
+    severity: ERROR
+
+  # CWE-502: Deserialization of Untrusted Data
+  - id: forbid-insecure-deserialization
+    patterns:
+      - pattern-either:
+          - pattern: pickle.loads(...)
+          - pattern: pickle.load(...)
+          - pattern: yaml.load($X)
+    message: "CodeQL CWE-502: Insecure deserialization via pickle or unsafe yaml is forbidden."
+    languages: [python]
     severity: ERROR

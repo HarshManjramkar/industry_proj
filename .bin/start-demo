@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -e
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+export PYTHONPATH="$PROJECT_ROOT/src:$PROJECT_ROOT"
+
+echo "=========================================================="
+echo "🚀 PMC RECONCILIATION COMMAND CENTER"
+echo "Reviewer: Harsh Manjramkar"
+echo "Serving at: http://localhost:8000"
+echo "No terminal interaction needed once browser is opened."
+echo "=========================================================="
+
+exec "$PROJECT_ROOT/.venv/bin/uvicorn" pmc_recon.server:app --host 0.0.0.0 --port 8000
