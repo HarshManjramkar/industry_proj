@@ -3,6 +3,17 @@ Adheres to strict SOLID principles, Pydantic contracts, and clean REST conventio
 Enables full end-to-end demo execution and verification without touching the terminal.
 """
 
+import sys
+from pathlib import Path
+
+# Bootstrap sys.path so server runs cleanly without requiring external PYTHONPATH
+_SRC_DIR = Path(__file__).resolve().parent.parent
+_REPO_ROOT = _SRC_DIR.parent
+if str(_SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(_SRC_DIR))
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(1, str(_REPO_ROOT))
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, FileResponse, PlainTextResponse

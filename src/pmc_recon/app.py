@@ -3,6 +3,17 @@ Provides human-in-the-loop inspection of sources, runs, linked records, raised f
 and live public government portal crawling with cryptographic proof verification.
 """
 
+import sys
+from pathlib import Path
+
+# Bootstrap sys.path so Streamlit runs cleanly without requiring external PYTHONPATH
+_SRC_DIR = Path(__file__).resolve().parent.parent
+_REPO_ROOT = _SRC_DIR.parent
+if str(_SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(_SRC_DIR))
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(1, str(_REPO_ROOT))
+
 from unittest.mock import MagicMock
 import pandas as pd
 import streamlit as st
