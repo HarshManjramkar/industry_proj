@@ -58,7 +58,7 @@ with tabs[0]:
     with db._get_connection() as conn:
         flags_df = pd.read_sql("SELECT flag_id, rule_id, title, severity, status, created_at FROM flags", conn)
     if not flags_df.empty:
-        st.dataframe(flags_df, use_container_width=True)
+        st.dataframe(flags_df, width="stretch")
     else:
         st.info("No active flags raised. Invariants satisfied.")
 
@@ -66,7 +66,7 @@ with tabs[1]:
     st.subheader("Cross-Dataset Links (Tender ↔ Budget Line)")
     with db._get_connection() as conn:
         links_df = pd.read_sql("SELECT * FROM entity_links", conn)
-    st.dataframe(links_df, use_container_width=True)
+    st.dataframe(links_df, width="stretch")
 
 with tabs[2]:
     st.subheader("Active & Historical Tenders (Official + Mirror)")
@@ -75,7 +75,7 @@ with tabs[2]:
             "SELECT tender_id, reference_number, title, value_inr, status, source_name FROM tenders",
             conn
         )
-    st.dataframe(tenders_df, use_container_width=True)
+    st.dataframe(tenders_df, width="stretch")
 
 with tabs[3]:
     st.subheader("Accounts Budget Reference Lines (FY 2025-26 & 2026-27)")
@@ -84,7 +84,7 @@ with tabs[3]:
             "SELECT budget_head_code, description_marathi, amount_inr_crore, fiscal_year, amount_type FROM budget_lines",
             conn
         )
-    st.dataframe(budget_df, use_container_width=True)
+    st.dataframe(budget_df, width="stretch")
 
 with tabs[4]:
     st.subheader("🌐 Public Government Portal Polite Crawler & Lineage Verification")
@@ -158,7 +158,7 @@ with tabs[4]:
         )
 
     if not raw_docs_df.empty:
-        st.dataframe(raw_docs_df, use_container_width=True)
+        st.dataframe(raw_docs_df, width="stretch")
 
         selected_doc = st.selectbox("Select Stored Document to Re-Verify Against Disk:", raw_docs_df["doc_id"].tolist())
         if st.button("🔍 Cryptographically Re-Verify Selected Document"):
