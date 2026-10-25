@@ -32,9 +32,25 @@ When evaluating government procurement data, our source discovery analyzed the *
 
 ## 3. How to Demonstrate Live Government Crawling to Judges / Stakeholders
 
-To demonstrate live crawler interaction without risking rate limits or network issues:
+You can conduct the complete live crawler demo directly inside the web dashboard with **zero terminal interaction required**:
 
-### Step 1: Execute the Live Polite Crawler Script
+### Option A: 100% Web UI Demonstration (Recommended for Pitches & Demos)
+1. Launch the interactive dashboard:
+   ```bash
+   .venv/bin/streamlit run src/pmc_recon/app.py
+   ```
+2. Navigate to the **"🌐 Live Govt Crawler Demo"** tab.
+3. Select your target public portal (`mahatenders.gov.in`, `pmc.gov.in`, or `Verified Offline Replay`).
+4. Click **"🚀 Trigger Polite Crawl (Zero Terminal Required)"**.
+5. The UI executes the crawl under full NFR-01 compliance and immediately displays:
+   - Live HTTP response status (200 OK)
+   - Immutable SHA-256 Preimage Hash (Theorem 1)
+   - Content-addressed Document ID (`doc_...`)
+   - Rate limiting, User-Agent header, and conditional ETag confirmations
+   - Expandable verbatim raw HTML payload viewer
+6. In the **"🔬 Tamper-Proof Cryptographic Lineage Auditor"** section, select any document and click **"🔍 Cryptographically Re-Verify Selected Document"** to prove that SHA-256 computed on-the-fly from disk bytes exactly matches the database record.
+
+### Option B: Terminal Verification Fallback (For Deep Technical Inquiries)
 Run the polite crawler against `mahatenders.gov.in` directly from the terminal:
 
 ```bash
@@ -82,4 +98,4 @@ To confirm all crawler oracles and security AST checks are green before demonstr
 ```bash
 .bin/verify-pipeline
 ```
-*(Executes Constitution invariants, Semgrep security rules, Sentrux architecture checks, and all 14 unit test oracles).*
+*(Executes Constitution invariants, Semgrep security rules, Sentrux architecture checks, and all 16 unit test oracles).*
