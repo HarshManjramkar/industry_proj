@@ -1,181 +1,263 @@
-"""UI Design Components, Dark/Light Mode Themes, and Regal Visual Assets for PMC Recon.
-Complies with SRP and keeps all source files strictly under 350 lines.
+"""UI Design Components, Zero-Scroll Viewport Tokens, and Regal Heraldry for PMC Recon.
+Strictly under 350 lines, adhering to SRP, high-contrast dark/light adaptability,
+and zero page-level scrolling layout constraints.
 """
 
+
 def get_theme_css() -> str:
-    """Return dark-mode and light-mode compatible CSS with regal civic styling."""
+    """Return CSS that locks page-level scrolling and establishes regal civic aesthetics."""
     return """
 <style>
-    /* Theme-Adaptive Variables */
-    :root {
-        --civic-navy: #0F172A;
-        --civic-gold: #D97706;
-        --civic-royal: #1E3A8A;
-        --card-bg: rgba(255, 255, 255, 0.95);
-        --card-border: #E2E8F0;
-        --text-primary: #0F172A;
-        --text-secondary: #475569;
+    /* Viewport-Locking & Root Zero-Scroll Rules */
+    html, body, [data-testid="stAppViewContainer"], .main {
+        overflow: hidden !important;
+        height: 100vh !important;
+        max-height: 100vh !important;
+        background-color: #080D1A !important;
+        color: #F8FAFC !important;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
     }
 
-    @media (prefers-color-scheme: dark) {
-        :root {
-            --civic-navy: #F8FAFC;
-            --civic-gold: #FBBF24;
-            --civic-royal: #60A5FA;
-            --card-bg: rgba(30, 41, 59, 0.85);
-            --card-border: rgba(255, 255, 255, 0.12);
-            --text-primary: #F8FAFC;
-            --text-secondary: #CBD5E1;
-        }
+    [data-testid="stHeader"] {
+        display: none !important;
     }
 
-    /* Streamlit Dark Mode Auto-Adaptation */
-    [data-testid="stAppViewContainer"] {
-        color: var(--text-primary);
+    .block-container {
+        padding: 0.6rem 1.25rem 0.4rem 1.25rem !important;
+        max-width: 100% !important;
+        height: 100vh !important;
+        box-sizing: border-box !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
     }
 
-    /* Regal Header Banner */
-    .regal-banner {
-        background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #1E3A8A 100%);
-        border: 1px solid rgba(217, 119, 6, 0.35);
-        border-radius: 12px;
-        padding: 1.5rem 2rem;
-        margin-bottom: 1.5rem;
+    /* Scrollable Inner Panel Workstation (Page never scrolls, only data panes) */
+    .viewport-dock {
+        height: calc(100vh - 165px) !important;
+        max-height: calc(100vh - 165px) !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        padding-right: 8px;
+        scrollbar-width: thin;
+        scrollbar-color: #D4AF37 rgba(15, 23, 42, 0.6);
+    }
+    .viewport-dock::-webkit-scrollbar {
+        width: 6px;
+    }
+    .viewport-dock::-webkit-scrollbar-thumb {
+        background-color: #D4AF37;
+        border-radius: 4px;
+    }
+
+    /* High-Density Regal Civic Top HUD */
+    .regal-top-hud {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: linear-gradient(90deg, #0A1128 0%, #101B3B 50%, #0D162E 100%);
+        border: 1px solid rgba(212, 175, 55, 0.35);
+        border-radius: 8px;
+        padding: 0.45rem 1rem;
+        margin-bottom: 0.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+    .hud-brand {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    .hud-title {
         color: #FFFFFF !important;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
-    }
-    .regal-banner h1 {
-        color: #FFFFFF !important;
-        font-size: 2.1rem;
+        font-size: 1.15rem;
         font-weight: 800;
+        letter-spacing: -0.01em;
         margin: 0;
-        letter-spacing: -0.02em;
+        line-height: 1.2;
     }
-    .regal-tagline {
-        color: #FCD34D !important;
-        font-size: 1.05rem;
-        font-weight: 500;
-        margin-top: 0.3rem;
+    .hud-subtitle {
+        color: #F3C648 !important;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+    }
+    .hud-ticker {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        background: rgba(11, 19, 43, 0.7);
+        border: 1px solid rgba(212, 175, 55, 0.25);
+        border-radius: 6px;
+        padding: 0.25rem 0.75rem;
+    }
+    .ticker-item {
+        font-size: 0.78rem;
+        color: #CBD5E1;
+    }
+    .ticker-item b {
+        color: #F8FAFC;
+    }
+    .ticker-pulse {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #10B981;
+        box-shadow: 0 0 6px #10B981;
     }
 
-    /* Bento Grid Card View */
+    /* High-Contrast Bento Cards & Story Panes */
     .bento-card {
-        background: var(--card-bg);
-        border: 1px solid var(--card-border);
-        border-radius: 12px;
-        padding: 1.25rem;
-        margin-bottom: 1rem;
-        color: var(--text-primary);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        background: #0E172E !important;
+        border: 1px solid rgba(212, 175, 55, 0.22) !important;
+        border-radius: 8px;
+        padding: 0.85rem;
+        margin-bottom: 0.65rem;
+        color: #F8FAFC !important;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
     }
-    .bento-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
-    }
-    .bento-card h3 {
-        color: var(--text-primary) !important;
-        margin-top: 0;
-        font-size: 1.2rem;
+    .bento-card h4 {
+        color: #F8FAFC !important;
+        margin: 0 0 0.35rem 0;
+        font-size: 0.98rem;
         font-weight: 700;
     }
     .bento-card p {
-        color: var(--text-secondary) !important;
-        font-size: 0.95rem;
-        line-height: 1.5;
+        color: #CBD5E1 !important;
+        font-size: 0.84rem;
+        line-height: 1.45;
+        margin-bottom: 0.35rem;
     }
 
-    /* Discrepancy Story Cards with Dark Mode Support */
+    /* Non-Defamatory Anomaly Cards */
     .anomaly-card {
-        background: var(--card-bg);
-        border-radius: 10px;
-        padding: 1.25rem;
-        margin-bottom: 1rem;
-        color: var(--text-primary);
-        border: 1px solid var(--card-border);
+        background: #0F1B38 !important;
+        border-radius: 8px;
+        padding: 0.85rem 1rem;
+        margin-bottom: 0.65rem;
+        color: #F8FAFC !important;
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
     .anomaly-card h4 {
-        margin-top: 0;
-        font-size: 1.15rem;
+        margin: 0 0 0.4rem 0;
+        font-size: 1.0rem;
         font-weight: 700;
+        color: #FFFFFF !important;
     }
-    .card-r1 { border-left: 5px solid #3B82F6; }
-    .card-r3 { border-left: 5px solid #F59E0B; }
-    .card-r6 { border-left: 5px solid #EF4444; }
+    .anomaly-card p {
+        color: #E2E8F0 !important;
+        font-size: 0.86rem;
+        line-height: 1.45;
+        margin: 0.2rem 0;
+    }
+    .card-r1 { border-left: 4px solid #38BDF8 !important; }
+    .card-r3 { border-left: 4px solid #F59E0B !important; }
+    .card-r6 { border-left: 4px solid #F87171 !important; }
 
-    /* Animated Video Simulation Mockup */
-    .video-hero {
-        position: relative;
-        background: radial-gradient(circle at 50% 50%, #1E293B 0%, #0F172A 100%);
-        border: 1px solid rgba(217, 119, 6, 0.4);
-        border-radius: 12px;
-        padding: 2rem;
-        text-align: center;
-        color: #F8FAFC;
-        margin-bottom: 2rem;
-        overflow: hidden;
+    /* Radar Results Pill Grid */
+    .radar-summary-box {
+        background: linear-gradient(135deg, #0B142B 0%, #131F3F 100%);
+        border: 1px solid rgba(212, 175, 55, 0.4);
+        border-radius: 8px;
+        padding: 0.85rem;
+        margin-bottom: 0.75rem;
     }
-    .video-pulse {
+    .radar-badge {
         display: inline-block;
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        background: #10B981;
-        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
-        animation: pulse 1.8s infinite;
-        margin-right: 6px;
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
     }
-    @keyframes pulse {
-        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-        70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
-        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    .radar-pass { background: rgba(16, 185, 129, 0.2); color: #34D399; border: 1px solid #10B981; }
+    .radar-alert { background: rgba(245, 158, 11, 0.2); color: #FBBF24; border: 1px solid #F59E0B; }
+    .radar-outlier { background: rgba(239, 68, 68, 0.2); color: #F87171; border: 1px solid #EF4444; }
+
+    /* Radio / Segmented Control Styling */
+    div[role="radiogroup"] {
+        background: #0B132B !important;
+        border: 1px solid rgba(212, 175, 55, 0.3) !important;
+        border-radius: 8px !important;
+        padding: 0.25rem 0.5rem !important;
+        margin-bottom: 0.4rem !important;
     }
 </style>
 """
 
+
 def render_regal_banner() -> str:
-    """Return HTML for the regal municipal heraldry and system pulse."""
+    """Return HTML for the high-density top command HUD with royal Maratha heraldry."""
     return """
-<div class="regal-banner">
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+<div class="regal-top-hud">
+    <div class="hud-brand">
+        <span style="font-size: 1.6rem;">🏛️</span>
         <div>
-            <h1>🏛️ पुणे महानगरपालिका • Pune Municipal Corporation</h1>
-            <div class="regal-tagline">
-                ⚖️ Public Procurement Reconciliation & Forensic Expenditure Audit System
+            <div class="hud-title">पुणे महानगरपालिका • Pune Municipal Corporation</div>
+            <div class="hud-subtitle">⚖️ Deterministic Civic Expenditure Reconciliation Command Center</div>
+        </div>
+    </div>
+    <div class="hud-ticker">
+        <div class="ticker-item"><span class="ticker-pulse"></span> <b>STATUS:</b> ACTIVE</div>
+        <div class="ticker-item">| <b>WATER BUDGET:</b> ₹ 2,077.43 Cr</div>
+        <div class="ticker-item">| <b>ZONES:</b> 141</div>
+        <div class="ticker-item">| <b>LINEAGE:</b> SHA-256 PRE-IMAGE</div>
+    </div>
+</div>
+"""
+
+
+def render_intro_video_walkthrough() -> str:
+    """Return a rich animated SVG/HTML5 civic briefing visual walkthrough."""
+    return """
+<div style="background: radial-gradient(circle at 50% 50%, #152243 0%, #0A1128 100%);
+            border: 1px solid rgba(212, 175, 55, 0.4); border-radius: 8px; padding: 0.9rem;
+            margin-bottom: 0.6rem; text-align: center;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+        <div style="text-align: left;">
+            <span style="background: rgba(212,175,55,0.2); color: #F3C648; font-size: 0.72rem;
+                         font-weight: 800; padding: 2px 7px; border-radius: 4px; letter-spacing: 0.08em;">
+                🎬 60-SECOND CIVIC BRIEFING THEATER
+            </span>
+            <div style="color: #FFFFFF; font-size: 1.05rem; font-weight: 700; margin-top: 0.2rem;">
+                Cross-Checking Pune's ₹ 2,077.43 Cr Water Infrastructure Without Bot Guesses
             </div>
         </div>
-        <div style="background: rgba(255,255,255,0.1); border: 1px solid rgba(251,191,36,0.4); padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: 600;">
-            <span class="video-pulse"></span> SYSTEM STATUS: ACTIVE (141 ZONES MONITORED)
+        <div style="display: flex; gap: 0.5rem;">
+            <span style="background: rgba(56,189,248,0.15); border: 1px solid #38BDF8; color: #38BDF8;
+                         padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">
+                Track A: Marathi Budget
+            </span>
+            <span style="background: rgba(245,158,11,0.15); border: 1px solid #F59E0B; color: #F59E0B;
+                         padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">
+                Track B: English Tenders
+            </span>
+            <span style="background: rgba(16,185,129,0.15); border: 1px solid #10B981; color: #10B981;
+                         padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">
+                Deterministic Radar
+            </span>
         </div>
     </div>
 </div>
 """
 
-def render_intro_video_walkthrough() -> str:
-    """Return a rich animated civic visual briefing introducing the system."""
-    return """
-<div class="video-hero">
-    <div style="font-size: 0.85rem; letter-spacing: 0.15em; color: #FCD34D; font-weight: 700; text-transform: uppercase;">
-        🎬 60-Second Civic Briefing Walkthrough
-    </div>
-    <h2 style="color: #FFFFFF !important; font-size: 1.8rem; margin: 0.5rem 0 1rem 0; font-weight: 800;">
-        How Pune's ₹ 2,077.43 Cr Water Supply Budget Gets Verified
-    </h2>
-    <div style="max-width: 780px; margin: 0 auto; color: #CBD5E1; font-size: 1.05rem; line-height: 1.6;">
-        Every year, PMC publishes budget books in <b>Marathi</b> (308 pages) and tender notices in <b>English</b>.
-        Watch this interactive command center cross-reference both datasets in real-time, catching additions slips,
-        mirror gaps, and impossible pipeline lengths with zero false accusations.
-    </div>
-    <div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
-        <span style="background: rgba(37,99,235,0.3); border: 1px solid #3B82F6; padding: 6px 14px; border-radius: 8px; font-size: 0.9rem;">
-            💧 141 Municipal Water Zones
-        </span>
-        <span style="background: rgba(245,158,11,0.3); border: 1px solid #F59E0B; padding: 6px 14px; border-radius: 8px; font-size: 0.9rem;">
-            🔍 3 Deterministic Forensic Invariants
-        </span>
-        <span style="background: rgba(16,185,129,0.3); border: 1px solid #10B981; padding: 6px 14px; border-radius: 8px; font-size: 0.9rem;">
-            🔒 SHA-256 Tamper-Proof Lineage
-        </span>
+
+def render_radar_header(execution_time_ms: float, rows_count: int, tamper_hash: str) -> str:
+    """Render summary banner for in-flight table scan."""
+    return f"""
+<div class="radar-summary-box">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <span class="radar-badge radar-pass">⚡ IN-FLIGHT RADAR ACTIVE</span>
+            <span style="color: #CBD5E1; font-size: 0.85rem; margin-left: 0.5rem;">
+                Inspected <b>{rows_count} table rows</b> in <b>{execution_time_ms} ms</b>
+            </span>
+        </div>
+        <div style="font-family: monospace; font-size: 0.75rem; color: #94A3B8;">
+            SHA-256: {tamper_hash[:16]}...
+        </div>
     </div>
 </div>
 """
