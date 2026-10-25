@@ -20,15 +20,21 @@
           <span class="brand-badge">Audit Kernel v1.0</span>
         </div>
       </div>
+      
       <div class="header-metrics">
         <div class="metric-pill"><span>Tenders Tracked:</span><span id="metric-tenders" class="metric-val">-</span></div>
         <div class="metric-pill"><span>Budget Heads:</span><span id="metric-budget" class="metric-val">-</span></div>
         <div class="metric-pill"><span>Entity Correlated:</span><span id="metric-links" class="metric-val">-</span></div>
         <div class="metric-pill"><span>Active Discrepancies:</span><span id="metric-flags" class="metric-val" style="color:var(--accent-rose);">-</span></div>
       </div>
-      <div class="user-badge">
-        <span style="color:var(--accent-cyan);">●</span>
-        <span>Reviewer: <strong>Harsh Manjramkar</strong></span>
+
+      <div class="header-controls">
+        <button id="btn-run-pipeline" class="btn-primary" onclick="executeFullPipeline()">⚡ Run Pipeline</button>
+        <button id="btn-reset-demo" class="btn-ghost" onclick="resetDemoState()">↺ Reset Demo</button>
+        <div class="user-badge">
+          <span style="color:var(--accent-cyan);">●</span>
+          <span>Reviewer: <strong>Harsh Manjramkar</strong></span>
+        </div>
       </div>
     </header>
 
@@ -75,8 +81,9 @@
               <div>• Awaiting selection</div>
             </div>
           </div>
-          <div class="dossier-section" style="margin-top:24px;">
+          <div class="dossier-actions" style="margin-top:24px; display:flex; flex-direction:column; gap:10px;">
             <button id="btn-resolve" class="action-btn" disabled onclick="resolveCurrentFlag()">Mark Anomaly as Explained</button>
+            <button id="btn-export-dossier" class="secondary-btn" disabled onclick="exportActiveDossier()">📥 Export Audit Dossier</button>
           </div>
         </div>
       </section>
@@ -89,6 +96,7 @@
     </footer>
   </div>
 
+  <div id="toast" class="toast-popup"></div>
   <script src="/static/app.js"></script>
 </body>
 </html>

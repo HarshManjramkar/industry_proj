@@ -34,6 +34,20 @@ class DatabaseEngine:
         with self._get_connection() as conn:
             conn.executescript(SQLITE_SCHEMA_DDL)
 
+    def reset_database(self) -> None:
+        """Clears all transactional tables for demo reset while preserving schema integrity."""
+        with self._get_connection() as conn:
+            conn.executescript("""
+            DELETE FROM reviews;
+            DELETE FROM flags;
+            DELETE FROM entity_links;
+            DELETE FROM change_events;
+            DELETE FROM tender_versions;
+            DELETE FROM tenders;
+            DELETE FROM budget_lines;
+            DELETE FROM raw_documents;
+            """)
+
     def save_raw_payload(self, run_id: str, payload_bytes: bytes, filename_prefix: str = "payload") -> RawDocument:
         """Stores raw bytes with SHA-256 content addressing and CWE-22 path traversal defense."""
         content_hash = hashlib.sha256(payload_bytes).hexdigest()
@@ -132,7 +146,7 @@ class DatabaseEngine:
                 INSERT OR REPLACE INTO change_events (change_id, record_id, record_type, change_type, changed_fields_json, detected_at)
                 VALUES (?, ?, ?, ?, ?, ?)
                 """, (change_event.change_id, change_event.record_id, change_event.record_type,
-                      change_event.change_type.value, json.dumps(change_event.changed_fields),
+                      change_event.change_type.value, json.dumps(change_event.changed_fields, default=str),
                       change_event.detected_at.isoformat()))
 
         return change_event

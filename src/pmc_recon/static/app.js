@@ -4,6 +4,7 @@
  * - Unidirectional data flow
  * - State immutability
  * - Strict XSS sanitization (CWE-79 prevention)
+ * - Complete zero-terminal operation
  */
 
 // Pure HTML sanitizer for CWE-79 mitigation
@@ -15,6 +16,15 @@ function escapeHtml(unsafe) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+}
+
+function showToast(message) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.classList.add('visible');
+  setTimeout(() => {
+    toast.classList.remove('visible');
+  }, 3500);
 }
 
 const AppState = {
@@ -50,6 +60,11 @@ async function loadData() {
 
     renderFlags();
     renderActiveView();
+
+    // Auto-select first flag if none selected
+    if (!AppState.selectedFlag && fRes.length > 0) {
+      selectFlag(fRes[0]);
+    }
   } catch (err) {
     console.error("Failed to load dashboard data:", err);
   }
@@ -59,12 +74,16 @@ function renderFlags() {
   const list = document.getElementById('anomaly-list');
   list.innerHTML = '';
 
+  if (AppState.activeFlags.length === 0) {
+    list.innerHTML = '<div style="color:var(--text-muted); font-size:12px; text-align:center; padding:20px;">No open discrepancies. System fully reconciled.</div>';
+    return;
+  }
+
   AppState.activeFlags.forEach(f => {
     const card = document.createElement('div');
     const isActive = AppState.selectedFlag && AppState.selectedFlag.flag_id === f.flag_id;
     card.className = `anomaly-card ${isActive ? 'active' : ''}`;
     
-    // XSS-safe rendering via escapeHtml
     card.innerHTML = `
       <div class="card-top">
         <span class="rule-chip">${escapeHtml(f.rule_id)}</span>
@@ -107,9 +126,66 @@ function selectFlag(f) {
     expContainer.appendChild(div);
   });
 
-  const btn = document.getElementById('btn-resolve');
-  btn.disabled = false;
-  btn.textContent = `Mark ${f.flag_id} as Explained`;
+  const btnResolve = document.getElementById('btn-resolve');
+  const btnExport = document.getElementById('btn-export-dossier');
+  
+  btnResolve.disabled = (f.status !== 'open');
+  btnResolve.textContent = f.status === 'open' ? `Mark ${f.flag_id} as Explained` : `Flag Status: ${f.status.toUpperCase()}`;
+  btnExport.disabled = false;
+}
+
+async function executeFullPipeline() {
+  const btn = document.getElementById('btn-run-pipeline');
+  btn.disabled = true;
+  btn.textContent = "⚡ Running...";
+  showToast("Executing Ingestion, Matching & Anomaly Rules...");
+
+  try {
+    const res = await fetch('/api/pipeline/run', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode: 'demo' })
+    });
+    const result = await res.json();
+    showToast(`✓ Ingested ${result.tenders_ingested} Tenders, Linked ${result.links_created}, Flagged ${result.flags_raised}`);
+    await loadData();
+  } catch (err) {
+    showToast("Pipeline execution error");
+    console.error(err);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "⚡ Run Pipeline";
+  }
+}
+
+async function resetDemoState() {
+  const btn = document.getElementById('btn-reset-demo');
+  btn.disabled = true;
+  showToast("Resetting to pristine baseline...");
+
+  try {
+    await fetch('/api/pipeline/reset', { method: 'POST' });
+    AppState.selectedFlag = null;
+    document.getElementById('target-title').textContent = "Select an anomaly from the queue";
+    document.getElementById('target-evidence').textContent = "{}";
+    document.getElementById('target-explanations').innerHTML = "<div>• Awaiting selection</div>";
+    document.getElementById('btn-resolve').disabled = true;
+    document.getElementById('btn-export-dossier').disabled = true;
+    showToast("✓ Demo state reset successfully");
+    await loadData();
+  } catch (err) {
+    showToast("Reset failed");
+    console.error(err);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function exportActiveDossier() {
+  if (!AppState.selectedFlag) return;
+  const flagId = AppState.selectedFlag.flag_id;
+  window.open(`/api/dossier/export/${flagId}`, '_blank');
+  showToast(`Downloading Audit Dossier for ${flagId}`);
 }
 
 async function resolveCurrentFlag() {
@@ -128,6 +204,7 @@ async function resolveCurrentFlag() {
         comment: 'Verified against official corrigendum notice 1. Innocent synchronization lag confirmed.'
       })
     });
+    showToast(`✓ Flag ${AppState.selectedFlag.flag_id} resolved as EXPLAINED`);
     await loadData();
   } catch (err) {
     console.error("Resolution failed:", err);
@@ -153,7 +230,7 @@ function renderActiveView() {
         <tbody>
           ${AppState.activeTenders.map(t => `
             <tr>
-              <td style="color:var(--accent-cyan);">${escapeHtml(t.tender_id)}</td>
+              <td style="color:var(--accent-cyan); font-weight:600;">${escapeHtml(t.tender_id)}</td>
               <td>${escapeHtml(t.reference_number)}</td>
               <td>${escapeHtml(t.title)}</td>
               <td style="color:var(--text-primary); font-weight:600;">₹ ${(t.value_inr).toLocaleString('en-IN')}</td>
