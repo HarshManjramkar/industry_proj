@@ -25,6 +25,7 @@ class CrawlResult:
     user_agent: str
     etag: Optional[str] = None
     last_modified: Optional[str] = None
+    cache_control: Optional[str] = None
     payload_preview: str = ""
     error_message: Optional[str] = None
 
@@ -103,6 +104,7 @@ class CrawlerDemoService:
             user_agent=self.crawler.user_agent,
             etag=fetch_res.get("etag"),
             last_modified=fetch_res.get("last_modified"),
+            cache_control=fetch_res.get("cache_control"),
             payload_preview=raw_text[:2000]
         )
 

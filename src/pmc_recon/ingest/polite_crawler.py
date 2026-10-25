@@ -78,5 +78,6 @@ class PoliteCrawler:
             "raw_doc_id": raw_doc.doc_id,
             "content_hash": raw_doc.content_hash,
             "etag": response.headers.get("ETag"),
-            "last_modified": response.headers.get("Last-Modified")
+            "last_modified": response.headers.get("Last-Modified"),
+            "cache_control": response.headers.get("Cache-Control")
         }

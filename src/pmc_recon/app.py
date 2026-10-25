@@ -137,12 +137,22 @@ with tabs[4]:
             c3.metric("Document Reference", crawl_result.doc_id)
 
             st.markdown("#### 🔒 Lineage & Safeguards Verification")
+            if crawl_result.etag:
+                etag_display = f"{crawl_result.etag} (Server Supported)"
+            elif crawl_result.cache_control and "no-store" in crawl_result.cache_control.lower():
+                etag_display = "Server specifies 'no-cache, no-store' (NIC dynamic tender schedule; ETag omitted)"
+            elif crawl_result.last_modified:
+                etag_display = f"Last-Modified: {crawl_result.last_modified}"
+            else:
+                etag_display = "Not emitted by host (Standard for dynamic transactional pages)"
+
             st.code(
                 f"• Target URL: {crawl_result.url}\n"
                 f"• Invariant Theorem 1 SHA-256 Hash: {crawl_result.content_hash}\n"
                 f"• Disk Storage Path: data/raw_store/{crawl_result.storage_path}\n"
                 f"• Header User-Agent: {crawl_result.user_agent}\n"
-                f"• Conditional ETag: {crawl_result.etag or 'N/A'}",
+                f"• Cache-Control: {crawl_result.cache_control or 'standard'}\n"
+                f"• Conditional Validator: {etag_display}",
                 language="yaml"
             )
 
