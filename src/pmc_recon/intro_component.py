@@ -1,120 +1,146 @@
 """Cinematic Movie-Style Intro Sequence for PMC Recon.
-Auto-transitions after 5 seconds or on click anywhere, with smooth 0.9s cinematic fade.
-No buttons required. Strictly under 350 lines and compliant with SRP.
+Executes pure 5.0s hardware-accelerated CSS sequence that covers entire viewport
+and smoothly fades out into the command center. No buttons, zero manual clicks.
+Strictly under 350 lines and compliant with SRP.
 """
 
+
 def render_cinematic_intro_html() -> str:
-    """Return fullscreen overlay with auto 5s timer and click-anywhere transition."""
+    """Return pure CSS fullscreen theatrical intro sequence that auto-transitions in 5s."""
     return """
 <style>
-    @keyframes epicFadeIn {
-        0% { opacity: 0; transform: translateY(22px) scale(0.96); }
-        100% { opacity: 1; transform: translateY(0) scale(1.0); }
+    @keyframes movieIntroSequence {
+        0% {
+            opacity: 0;
+            transform: scale(0.96);
+            visibility: visible;
+            pointer-events: all;
+        }
+        12% {
+            opacity: 1;
+            transform: scale(1.0);
+            visibility: visible;
+            pointer-events: all;
+        }
+        78% {
+            opacity: 1;
+            transform: scale(1.0);
+            visibility: visible;
+            pointer-events: all;
+        }
+        94% {
+            opacity: 0;
+            transform: scale(1.04);
+            visibility: visible;
+            pointer-events: none;
+        }
+        100% {
+            opacity: 0;
+            transform: scale(1.04);
+            visibility: hidden;
+            pointer-events: none;
+            display: none;
+        }
     }
-    @keyframes goldAuraPulse {
-        0% { box-shadow: 0 0 25px rgba(212, 175, 55, 0.25), inset 0 0 15px rgba(212, 175, 55, 0.1); }
-        50% { box-shadow: 0 0 65px rgba(212, 175, 55, 0.5), inset 0 0 30px rgba(243, 198, 72, 0.25); }
-        100% { box-shadow: 0 0 25px rgba(212, 175, 55, 0.25), inset 0 0 15px rgba(212, 175, 55, 0.1); }
+
+    @keyframes goldAuraGlow {
+        0% { box-shadow: 0 0 30px rgba(212, 175, 55, 0.25), inset 0 0 15px rgba(212, 175, 55, 0.1); }
+        50% { box-shadow: 0 0 65px rgba(212, 175, 55, 0.55), inset 0 0 35px rgba(243, 198, 72, 0.25); }
+        100% { box-shadow: 0 0 30px rgba(212, 175, 55, 0.25), inset 0 0 15px rgba(212, 175, 55, 0.1); }
     }
-    @keyframes progressCountdown {
+
+    @keyframes timelineFill {
         0% { width: 0%; }
         100% { width: 100%; }
     }
 
     #cinematicIntroOverlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        z-index: 999999;
-        background: radial-gradient(ellipse at 50% 45%, #0E1D44 0%, #070C1D 65%, #020409 100%);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-        user-select: none;
-        transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        z-index: 99999999 !important;
+        background: radial-gradient(ellipse at 50% 45%, #0E1D44 0%, #070C1D 65%, #020409 100%) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        animation: movieIntroSequence 5.0s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+        box-sizing: border-box !important;
+        padding: 2rem !important;
+        cursor: pointer !important;
     }
 
     .cinematic-stage {
-        background: rgba(10, 18, 41, 0.85);
-        border: 2px solid rgba(212, 175, 55, 0.45);
-        border-radius: 16px;
-        padding: 3.5rem 3rem 2.5rem 3rem;
-        text-align: center;
-        animation: epicFadeIn 1.2s cubic-bezier(0.16, 1, 0.3, 1), goldAuraPulse 4s infinite ease-in-out;
-        max-width: 960px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+        background: rgba(10, 18, 41, 0.92) !important;
+        border: 2px solid rgba(212, 175, 55, 0.5) !important;
+        border-radius: 16px !important;
+        padding: 3.5rem 3rem 2.8rem 3rem !important;
+        text-align: center !important;
+        animation: goldAuraGlow 4s infinite ease-in-out !important;
+        max-width: 960px !important;
+        box-shadow: 0 12px 50px rgba(0, 0, 0, 0.8) !important;
     }
     .cinema-prelude {
-        color: #F3C648;
-        font-size: 0.85rem;
-        letter-spacing: 0.35em;
-        font-weight: 800;
-        text-transform: uppercase;
-        margin-bottom: 0.85rem;
+        color: #F3C648 !important;
+        font-size: 0.85rem !important;
+        letter-spacing: 0.35em !important;
+        font-weight: 800 !important;
+        text-transform: uppercase !important;
+        margin-bottom: 0.85rem !important;
     }
     .cinema-main-title {
         color: #FFFFFF !important;
-        font-size: 3.0rem !important;
+        font-size: 2.9rem !important;
         font-weight: 900 !important;
-        letter-spacing: -0.02em;
-        line-height: 1.15;
-        margin: 0.4rem 0 0.8rem 0;
-        text-shadow: 0 4px 25px rgba(0, 0, 0, 0.9), 0 0 35px rgba(212, 175, 55, 0.45);
+        letter-spacing: -0.02em !important;
+        line-height: 1.15 !important;
+        margin: 0.4rem 0 0.8rem 0 !important;
+        text-shadow: 0 4px 25px rgba(0, 0, 0, 0.9), 0 0 35px rgba(212, 175, 55, 0.45) !important;
     }
     .cinema-subtitle {
         color: #E2E8F0 !important;
-        font-size: 1.2rem;
-        font-weight: 500;
-        max-width: 760px;
-        margin: 0 auto 1.8rem auto;
-        line-height: 1.6;
+        font-size: 1.15rem !important;
+        font-weight: 500 !important;
+        max-width: 760px !important;
+        margin: 0 auto 1.8rem auto !important;
+        line-height: 1.6 !important;
     }
     .cinema-stats-strip {
-        display: flex;
-        justify-content: center;
-        gap: 1.25rem;
-        flex-wrap: wrap;
-        margin-bottom: 1.5rem;
+        display: flex !important;
+        justify-content: center !important;
+        gap: 1.25rem !important;
+        flex-wrap: wrap !important;
     }
     .stat-pill {
-        background: rgba(15, 23, 42, 0.9);
-        border: 1px solid rgba(212, 175, 55, 0.35);
-        padding: 0.5rem 1.15rem;
-        border-radius: 8px;
-        font-size: 0.88rem;
-        color: #F8FAFC;
+        background: rgba(15, 23, 42, 0.9) !important;
+        border: 1px solid rgba(212, 175, 55, 0.35) !important;
+        padding: 0.5rem 1.15rem !important;
+        border-radius: 8px !important;
+        font-size: 0.88rem !important;
+        color: #F8FAFC !important;
     }
     .stat-pill b {
-        color: #F3C648;
-    }
-    .cinema-hint {
-        color: #94A3B8;
-        font-size: 0.85rem;
-        letter-spacing: 0.05em;
-        margin-top: 1rem;
-        text-transform: uppercase;
+        color: #F3C648 !important;
     }
 
     .countdown-bar-container {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100vw;
-        height: 3px;
-        background: rgba(212, 175, 55, 0.2);
+        position: absolute !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 4px !important;
+        background: rgba(212, 175, 55, 0.2) !important;
     }
     .countdown-bar-fill {
-        height: 100%;
-        background: linear-gradient(90deg, #F3C648, #D4AF37, #38BDF8);
-        animation: progressCountdown 5s linear forwards;
+        height: 100% !important;
+        background: linear-gradient(90deg, #F3C648, #D4AF37, #38BDF8) !important;
+        animation: timelineFill 5.0s linear forwards !important;
     }
 </style>
 
-<div id="cinematicIntroOverlay" onclick="dismissCinematicIntro()">
+<div id="cinematicIntroOverlay" onclick="this.style.display='none'">
     <div class="cinematic-stage">
         <div class="cinema-prelude">
             🏛️ PUNE MUNICIPAL CORPORATION • CIVIC FORENSIC PROLOGUE
@@ -133,7 +159,7 @@ def render_cinematic_intro_html() -> str:
             In a metropolis of <b>4.5 Million citizens</b>, <b>₹ 2,077.43 Crores</b> are allocated for water supply.
             Published across 308-page Marathi budget books and English state tender portals.
             <br>
-            <span style="color: #94A3B8; font-size: 0.98rem;">
+            <span style="color: #94A3B8; font-size: 0.95rem;">
                 Mathematical invariants, Hampel MAD filters, and SHA-256 cryptographic lineage cross-examine public expenditure with zero bot hallucinations.
             </span>
         </p>
@@ -143,27 +169,9 @@ def render_cinematic_intro_html() -> str:
             <div class="stat-pill">⚡ <b>&lt; 5 ms</b> Deterministic Invariant Radar</div>
             <div class="stat-pill">🔒 <b>SHA-256</b> Cryptographic Lineage</div>
         </div>
-        <div class="cinema-hint">
-            ⏳ Entering command center automatically in 5s • Click anywhere to enter immediately
-        </div>
     </div>
     <div class="countdown-bar-container">
         <div class="countdown-bar-fill"></div>
     </div>
 </div>
-
-<script>
-function dismissCinematicIntro() {
-    const el = document.getElementById('cinematicIntroOverlay');
-    if (el && el.style.display !== 'none') {
-        el.style.opacity = '0';
-        el.style.transform = 'scale(1.04)';
-        setTimeout(() => {
-            el.style.display = 'none';
-        }, 900);
-    }
-}
-// Automatically trigger transition after 5 seconds
-setTimeout(dismissCinematicIntro, 5000);
-</script>
 """

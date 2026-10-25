@@ -55,13 +55,9 @@ st.set_page_config(page_title="PMC Civic Reconciliation | Pune", page_icon="🏛
 st.markdown(get_theme_css(), unsafe_allow_html=True)
 
 # -------------------------------------------------------------------
-# CINEMATIC MOVIE INTRO OVERLAY (5s Auto-Fade / Click-Anywhere Skip)
+# THEATRICAL MOVIE INTRO OVERLAY (Pure CSS 5s Auto-Fade / Click to Skip)
 # -------------------------------------------------------------------
-if "show_intro_overlay" not in st.session_state:
-    st.session_state.show_intro_overlay = True
-
-if st.session_state.show_intro_overlay:
-    st.markdown(render_cinematic_intro_html(), unsafe_allow_html=True)
+st.markdown(render_cinematic_intro_html(), unsafe_allow_html=True)
 
 # -------------------------------------------------------------------
 # COMMAND CENTER COCKPIT
@@ -72,25 +68,19 @@ db = DatabaseEngine()
 crawler_service = CrawlerDemoService(db=db)
 validator = LiveTableValidator()
 
-# Navigation Ribbon with Replay Intro trigger
-nav_c1, nav_c2 = st.columns([0.84, 0.16])
-with nav_c1:
-    view = st.radio(
-        "Navigation Hub:",
-        [
-            "⚡ In-Flight Table Radar (Epic 6)",
-            "🚨 3 Verified Discrepancies",
-            "📊 Citizen Charts",
-            "🔗 Marathi ↔ English",
-            "🌐 Live Ingest & Seal"
-        ],
-        horizontal=True,
-        label_visibility="collapsed"
-    )
-with nav_c2:
-    if st.button("🎬 Movie Intro", width="stretch"):
-        st.session_state.show_intro_overlay = True
-        st.rerun()
+# Clean Full-Width Navigation Hub
+view = st.radio(
+    "Navigation Hub:",
+    [
+        "⚡ In-Flight Table Radar (Epic 6)",
+        "🚨 3 Verified Discrepancies",
+        "📊 Citizen Charts",
+        "🔗 Marathi ↔ English",
+        "🌐 Live Ingest & Seal"
+    ],
+    horizontal=True,
+    label_visibility="collapsed"
+)
 
 PANE_HEIGHT = 580
 
