@@ -4,6 +4,7 @@ Complies strictly with SRP, neutral language policies, and <350 line constraint.
 """
 
 import sys
+import time
 from pathlib import Path
 
 # Bootstrap sys.path for direct script execution
@@ -55,9 +56,18 @@ st.set_page_config(page_title="PMC Civic Reconciliation | Pune", page_icon="🏛
 st.markdown(get_theme_css(), unsafe_allow_html=True)
 
 # -------------------------------------------------------------------
-# THEATRICAL MOVIE INTRO OVERLAY (Pure CSS 5s Auto-Fade / Click to Skip)
+# THEATRICAL MOVIE INTRO SEQUENCE (Plays Once on Load with Auto-Fade)
 # -------------------------------------------------------------------
-st.markdown(render_cinematic_intro_html(), unsafe_allow_html=True)
+if "intro_played" not in st.session_state:
+    st.session_state.intro_played = False
+
+if not st.session_state.intro_played:
+    intro_box = st.empty()
+    intro_box.markdown(render_cinematic_intro_html(), unsafe_allow_html=True)
+    time.sleep(3.5)
+    intro_box.empty()
+    st.session_state.intro_played = True
+    st.rerun()
 
 # -------------------------------------------------------------------
 # COMMAND CENTER COCKPIT
@@ -68,7 +78,7 @@ db = DatabaseEngine()
 crawler_service = CrawlerDemoService(db=db)
 validator = LiveTableValidator()
 
-# Clean Full-Width Navigation Hub
+# Clean Navigation Ribbon (Zero extra buttons)
 view = st.radio(
     "Navigation Hub:",
     [

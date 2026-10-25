@@ -1,46 +1,18 @@
 """Cinematic Movie-Style Intro Sequence for PMC Recon.
-Executes pure 5.0s hardware-accelerated CSS sequence that covers entire viewport
-and smoothly fades out into the command center. No buttons, zero manual clicks.
+Renders fullscreen theatrical sequence with gold aura and automatic transition.
 Strictly under 350 lines and compliant with SRP.
 """
 
 
 def render_cinematic_intro_html() -> str:
-    """Return pure CSS fullscreen theatrical intro sequence that auto-transitions in 5s."""
+    """Return fullscreen theatrical intro sequence with smooth timed fade."""
     return """
 <style>
-    @keyframes movieIntroSequence {
-        0% {
-            opacity: 0;
-            transform: scale(0.96);
-            visibility: visible;
-            pointer-events: all;
-        }
-        12% {
-            opacity: 1;
-            transform: scale(1.0);
-            visibility: visible;
-            pointer-events: all;
-        }
-        78% {
-            opacity: 1;
-            transform: scale(1.0);
-            visibility: visible;
-            pointer-events: all;
-        }
-        94% {
-            opacity: 0;
-            transform: scale(1.04);
-            visibility: visible;
-            pointer-events: none;
-        }
-        100% {
-            opacity: 0;
-            transform: scale(1.04);
-            visibility: hidden;
-            pointer-events: none;
-            display: none;
-        }
+    @keyframes cinemaFade {
+        0% { opacity: 0; transform: scale(0.96); }
+        15% { opacity: 1; transform: scale(1.0); }
+        75% { opacity: 1; transform: scale(1.0); }
+        100% { opacity: 0; transform: scale(1.03); }
     }
 
     @keyframes goldAuraGlow {
@@ -54,7 +26,7 @@ def render_cinematic_intro_html() -> str:
         100% { width: 100%; }
     }
 
-    #cinematicIntroOverlay {
+    .cinematic-fullscreen {
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
@@ -66,21 +38,20 @@ def render_cinematic_intro_html() -> str:
         flex-direction: column !important;
         justify-content: center !important;
         align-items: center !important;
-        animation: movieIntroSequence 5.0s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+        animation: cinemaFade 3.5s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
         box-sizing: border-box !important;
         padding: 2rem !important;
-        cursor: pointer !important;
     }
 
     .cinematic-stage {
-        background: rgba(10, 18, 41, 0.92) !important;
+        background: rgba(10, 18, 41, 0.94) !important;
         border: 2px solid rgba(212, 175, 55, 0.5) !important;
         border-radius: 16px !important;
         padding: 3.5rem 3rem 2.8rem 3rem !important;
         text-align: center !important;
-        animation: goldAuraGlow 4s infinite ease-in-out !important;
+        animation: goldAuraGlow 3s infinite ease-in-out !important;
         max-width: 960px !important;
-        box-shadow: 0 12px 50px rgba(0, 0, 0, 0.8) !important;
+        box-shadow: 0 12px 50px rgba(0, 0, 0, 0.85) !important;
     }
     .cinema-prelude {
         color: #F3C648 !important;
@@ -136,11 +107,11 @@ def render_cinematic_intro_html() -> str:
     .countdown-bar-fill {
         height: 100% !important;
         background: linear-gradient(90deg, #F3C648, #D4AF37, #38BDF8) !important;
-        animation: timelineFill 5.0s linear forwards !important;
+        animation: timelineFill 3.5s linear forwards !important;
     }
 </style>
 
-<div id="cinematicIntroOverlay" onclick="this.style.display='none'">
+<div class="cinematic-fullscreen">
     <div class="cinematic-stage">
         <div class="cinema-prelude">
             🏛️ PUNE MUNICIPAL CORPORATION • CIVIC FORENSIC PROLOGUE
