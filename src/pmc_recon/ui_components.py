@@ -23,7 +23,7 @@ def get_theme_css() -> str:
     }
 
     .block-container {
-        padding-top: 0.6rem !important;
+        padding-top: 0.5rem !important;
         padding-bottom: 0.2rem !important;
         padding-left: 1.25rem !important;
         padding-right: 1.25rem !important;
@@ -37,10 +37,10 @@ def get_theme_css() -> str:
         justify-content: space-between;
         align-items: center;
         background: linear-gradient(90deg, #0A1128 0%, #101B3B 50%, #0D162E 100%);
-        border: 1px solid rgba(212, 175, 55, 0.35);
+        border: 1px solid rgba(212, 175, 55, 0.4);
         border-radius: 8px;
         padding: 0.45rem 1rem;
-        margin-bottom: 0.45rem;
+        margin-bottom: 0.4rem;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     }
     .hud-brand {
@@ -88,53 +88,62 @@ def get_theme_css() -> str:
         box-shadow: 0 0 6px #10B981;
     }
 
-    /* HIGH-CONTRAST TAB BAR & LABELS (FIX DARK-ON-DARK DEFECT) */
+    /* HIGH-CONTRAST TAB BAR & LABELS */
     div[role="radiogroup"] {
         background: #0E172E !important;
         border: 1px solid rgba(212, 175, 55, 0.4) !important;
         border-radius: 8px !important;
         padding: 0.35rem 0.75rem !important;
-        margin-bottom: 0.45rem !important;
+        margin-bottom: 0.4rem !important;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
     }
-    div[role="radiogroup"] label {
-        color: #F8FAFC !important;
-        margin-right: 1.25rem !important;
-    }
+    div[role="radiogroup"] label,
     div[role="radiogroup"] label p,
     div[role="radiogroup"] label span,
-    div[role="radiogroup"] label div {
+    div[role="radiogroup"] label div,
+    [data-testid="stRadio"] label,
+    [data-testid="stRadio"] label * {
         color: #F8FAFC !important;
         font-size: 0.90rem !important;
         font-weight: 600 !important;
-        letter-spacing: 0.01em !important;
     }
-    /* Highlight the active selected tab in bright gold */
-    div[role="radiogroup"] label:has(input:checked) p,
-    div[role="radiogroup"] label[data-checked="true"] p {
+    div[role="radiogroup"] label:has(input:checked) *,
+    div[role="radiogroup"] label[data-checked="true"] * {
         color: #F3C648 !important;
         font-weight: 800 !important;
-        text-shadow: 0 0 8px rgba(243, 198, 72, 0.3) !important;
     }
 
-    /* Video Briefing Toggle Contrast */
-    div[data-testid="stToggle"] label p,
-    div[data-testid="stToggle"] label span {
-        color: #F8FAFC !important;
-        font-weight: 700 !important;
-        font-size: 0.90rem !important;
-    }
-
-    /* General Widget & Form Labels */
-    [data-testid="stWidgetLabel"] p,
-    [data-testid="stWidgetLabel"] span,
-    [data-testid="stWidgetLabel"] label {
+    /* All Form and Widget Labels (Selectboxes, text areas, inputs) */
+    [data-testid="stWidgetLabel"],
+    [data-testid="stWidgetLabel"] *,
+    label[data-testid="stWidgetLabel"] {
         color: #F8FAFC !important;
         font-weight: 600 !important;
         font-size: 0.92rem !important;
     }
 
-    /* Headings & Captions Contrast */
+    /* Inputs, Selectboxes, and Textarea background + text contrast */
+    textarea,
+    input,
+    [data-testid="stTextArea"] textarea,
+    [data-testid="stTextInput"] input {
+        background-color: #0E172E !important;
+        color: #F8FAFC !important;
+        border: 1px solid rgba(212, 175, 55, 0.4) !important;
+        border-radius: 6px !important;
+        font-family: monospace !important;
+        font-size: 0.85rem !important;
+    }
+
+    /* Toggle label contrast */
+    div[data-testid="stToggle"] label,
+    div[data-testid="stToggle"] label * {
+        color: #F8FAFC !important;
+        font-weight: 700 !important;
+        font-size: 0.90rem !important;
+    }
+
+    /* Headings & Captions */
     h1, h2, h3, h4, h5, h6 {
         color: #FFFFFF !important;
     }
@@ -166,7 +175,7 @@ def get_theme_css() -> str:
         background-color: #0B132B !important;
     }
 
-    /* Anomaly Cards Inside Scrollable Panes */
+    /* Anomaly Cards */
     .anomaly-card {
         background: #0A1128 !important;
         border-radius: 8px;

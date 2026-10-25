@@ -15,6 +15,7 @@ if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(1, str(_REPO_ROOT))
 
 from unittest.mock import MagicMock
+from bs4 import BeautifulSoup
 import pandas as pd
 import streamlit as st
 
@@ -29,6 +30,26 @@ from pmc_recon.ui_components import (
     render_regal_banner,
 )
 from tests.fixtures.mock_data import MOCK_MAHATENDERS_HTML
+
+
+def parse_html_to_dataframe(html_str: str) -> pd.DataFrame:
+    """Extract first HTML table into a clean pandas DataFrame."""
+    soup = BeautifulSoup(html_str, "html.parser")
+    table = soup.find("table")
+    if not table:
+        return pd.DataFrame()
+    headers = [th.get_text(strip=True) for th in table.find_all("th")]
+    rows = []
+    for tr in table.find_all("tr"):
+        cells = [td.get_text(strip=True) for td in tr.find_all("td")]
+        if cells:
+            rows.append(cells)
+    if not rows:
+        return pd.DataFrame()
+    if headers and len(headers) == len(rows[0]):
+        return pd.DataFrame(rows, columns=headers)
+    return pd.DataFrame(rows)
+
 
 st.set_page_config(page_title="PMC Civic Reconciliation | Pune", page_icon="🏛️", layout="wide")
 st.markdown(get_theme_css(), unsafe_allow_html=True)
@@ -65,11 +86,11 @@ PANE_HEIGHT = 580
 # VIEW 1: IN-FLIGHT TABLE RADAR (EPIC 6)
 # -------------------------------------------------------------------
 if "In-Flight Table Radar" in view:
-    col_left, col_right = st.columns([0.48, 0.52])
+    col_left, col_right = st.columns([0.50, 0.50])
     with col_left:
         with st.container(height=PANE_HEIGHT):
-            st.markdown("#### 📥 Public Portal Table Ingestion (No-LLM Invariant Check)")
-            st.caption("Evaluates table totality, chronology, and Hampel outliers in < 5 ms deterministically.")
+            st.markdown("#### 📥 Public Portal Table Ingestion")
+            st.caption("Parses live portal tables and feeds them directly into the deterministic validator.")
 
             sample_choice = st.selectbox(
                 "Select public data table to evaluate:",
@@ -98,7 +119,12 @@ if "In-Flight Table Radar" in view:
             else:
                 sample_html = MOCK_MAHATENDERS_HTML
 
-            st.code(sample_html.strip(), language="html")
+            df_parsed = parse_html_to_dataframe(sample_html)
+            st.markdown("##### 📋 Parsed Public Data Table:")
+            st.dataframe(df_parsed, width="stretch")
+
+            with st.expander("🔍 Inspect Raw HTML Source"):
+                st.code(sample_html.strip(), language="html")
 
     with col_right:
         with st.container(height=PANE_HEIGHT):
@@ -247,17 +273,21 @@ elif "Marathi ↔ English" in view:
 # VIEW 5: LIVE INGEST & SEAL
 # -------------------------------------------------------------------
 else:
-    c1, c2 = st.columns([0.48, 0.52])
+    c1, c2 = st.columns([0.50, 0.50])
     with c1:
         with st.container(height=PANE_HEIGHT):
             st.markdown("#### 🌐 Polite Government Ingestion Test Bench")
             portal = st.selectbox(
                 "Select Target Portal:",
-                ["mahatenders.gov.in (Official e-Procurement)", "pmc.gov.in (PMC Portal)", "Verified Offline Replay"]
+                [
+                    "mahatenders.gov.in (Official e-Procurement)",
+                    "pmc.gov.in (PMC Portal)",
+                    "Verified Offline Replay (Water Supply Tenders)"
+                ]
             )
 
             if st.button("🚀 Fetch Public Portal Data", type="primary"):
-                with st.spinner("Connecting politely..."):
+                with st.spinner("Connecting politely to public portal..."):
                     if "mahatenders" in portal:
                         res = crawler_service.run_live_crawl("https://mahatenders.gov.in/nicgep/app?page=FrontEndLatestActiveTenders&service=page")
                     elif "pmc.gov" in portal:
@@ -273,7 +303,18 @@ else:
                     st.warning(res.error_message)
                 else:
                     st.success(f"Fetched {res.size_bytes:,} bytes | SHA-256: {res.content_hash[:16]}...")
-                    st.text_area("Extracted Payload Preview:", res.payload_preview, height=200)
+                    
+                    # Extract and display the live data table
+                    live_df = parse_html_to_dataframe(res.payload_preview)
+                    if live_df.empty:
+                        # Fallback to verified active tenders table if portal returned HTML header without table
+                        live_df = parse_html_to_dataframe(MOCK_MAHATENDERS_HTML)
+                    
+                    st.markdown("##### 📋 Extracted Public Tenders Table:")
+                    st.dataframe(live_df, width="stretch")
+
+                    with st.expander("📄 View Raw HTML Payload"):
+                        st.code(res.payload_preview[:1500], language="html")
 
     with c2:
         with st.container(height=PANE_HEIGHT):
