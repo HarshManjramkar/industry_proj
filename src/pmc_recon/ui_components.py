@@ -23,29 +23,27 @@ def get_theme_css() -> str:
     }
 
     .block-container {
-        padding: 0.6rem 1.25rem 0.4rem 1.25rem !important;
+        padding-top: 0.6rem !important;
+        padding-bottom: 0.2rem !important;
+        padding-left: 1.25rem !important;
+        padding-right: 1.25rem !important;
         max-width: 100% !important;
-        height: 100vh !important;
         box-sizing: border-box !important;
-        display: flex !important;
-        flex-direction: column !important;
-        overflow: hidden !important;
     }
 
-    /* Scrollable Inner Panel Workstation (Page never scrolls, only data panes) */
-    .viewport-dock {
-        height: calc(100vh - 165px) !important;
-        max-height: calc(100vh - 165px) !important;
+    /* Streamlit columns are independently scrollable; root page never scrolls */
+    [data-testid="stColumn"] {
+        max-height: calc(100vh - 135px) !important;
         overflow-y: auto !important;
         overflow-x: hidden !important;
-        padding-right: 8px;
+        padding-right: 8px !important;
         scrollbar-width: thin;
         scrollbar-color: #D4AF37 rgba(15, 23, 42, 0.6);
     }
-    .viewport-dock::-webkit-scrollbar {
+    [data-testid="stColumn"]::-webkit-scrollbar {
         width: 6px;
     }
-    .viewport-dock::-webkit-scrollbar-thumb {
+    [data-testid="stColumn"]::-webkit-scrollbar-thumb {
         background-color: #D4AF37;
         border-radius: 4px;
     }

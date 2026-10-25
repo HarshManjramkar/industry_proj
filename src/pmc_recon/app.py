@@ -65,7 +65,6 @@ if show_briefing:
 if "In-Flight Table Radar" in view:
     col_left, col_right = st.columns([0.48, 0.52])
     with col_left:
-        st.markdown('<div class="viewport-dock">', unsafe_allow_html=True)
         st.markdown("#### 📥 Public Portal Table Ingestion (No-LLM Invariant Check)")
         st.caption("Evaluates table totality, chronology, and Hampel outliers in < 5 ms deterministically.")
 
@@ -97,15 +96,12 @@ if "In-Flight Table Radar" in view:
             sample_html = MOCK_MAHATENDERS_HTML
 
         st.code(sample_html.strip(), language="html")
-        st.markdown('</div>', unsafe_allow_html=True)
 
     with col_right:
-        st.markdown('<div class="viewport-dock">', unsafe_allow_html=True)
         report = validator.scan_html_table(sample_html)
         st.markdown(render_radar_header(report.execution_time_ms, report.total_rows_inspected, report.tamper_hash), unsafe_allow_html=True)
 
         if "Budget" in sample_choice:
-            # Explicit totality check on Electrical slip
             sub_discs = validator.validate_totality(
                 rows=[{"val": 80.90}, {"val": 185.22}],
                 value_key="val",
@@ -134,7 +130,6 @@ if "In-Flight Table Radar" in view:
         st.markdown("**Validated Passing Invariants:**")
         for inv in report.passed_invariants:
             st.markdown(f"• <span style='color:#34D399;'>✓ {inv}</span>", unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
 
 # -------------------------------------------------------------------
 # VIEW 2: 3 VERIFIED DISCREPANCIES (GROUND TRUTH)
@@ -142,7 +137,6 @@ if "In-Flight Table Radar" in view:
 elif "3 Verified Discrepancies" in view:
     col1, col2 = st.columns([0.5, 0.5])
     with col1:
-        st.markdown('<div class="viewport-dock">', unsafe_allow_html=True)
         st.markdown("""
         <div class="anomaly-card card-r3">
             <h4>1. The ₹ 40 Lakh Budget Addition Slip (Rule R3)</h4>
@@ -158,10 +152,8 @@ elif "3 Verified Discrepancies" in view:
             <p><b>Benign Explanation:</b> Mirror crawler synchronization lag or value derived from EMD fee ratio.</p>
         </div>
         """, unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
 
     with col2:
-        st.markdown('<div class="viewport-dock">', unsafe_allow_html=True)
         st.markdown("""
         <div class="anomaly-card card-r6">
             <h4>3. The 450 km Water Pipeline Outlier (Rule R6: Hampel Filter)</h4>
@@ -184,7 +176,6 @@ elif "3 Verified Discrepancies" in view:
                 file_name=f"audit_{f_map[sel_f]}.md",
                 mime="text/markdown"
             )
-        st.markdown('</div>', unsafe_allow_html=True)
 
 # -------------------------------------------------------------------
 # VIEW 3: CITIZEN CHARTS
@@ -192,7 +183,6 @@ elif "3 Verified Discrepancies" in view:
 elif "Citizen Charts" in view:
     c1, c2 = st.columns(2)
     with c1:
-        st.markdown('<div class="viewport-dock">', unsafe_allow_html=True)
         st.markdown("#### 💧 PMC Water Supply Budget Allocation")
         st.caption("Capital infrastructure vs day-to-day operations")
         df_b = pd.DataFrame({
@@ -207,10 +197,8 @@ elif "Citizen Charts" in view:
             "Total (₹ Cr)": [265.72, 266.12]
         })
         st.bar_chart(df_m.set_index("Record"), color="#F59E0B")
-        st.markdown('</div>', unsafe_allow_html=True)
 
     with c2:
-        st.markdown('<div class="viewport-dock">', unsafe_allow_html=True)
         st.markdown("#### 🚨 Lohegaon 450 km Statistical Outlier")
         st.caption("Hampel MAD filter catches anomalous spike against peer distribution")
         df_p = pd.DataFrame({
@@ -225,7 +213,6 @@ elif "Citizen Charts" in view:
             "Valuation (₹ Cr)": [18.50, 19.20]
         })
         st.bar_chart(df_c.set_index("Portal"), color="#10B981")
-        st.markdown('</div>', unsafe_allow_html=True)
 
 # -------------------------------------------------------------------
 # VIEW 4: MARATHI ↔ ENGLISH LINKER
@@ -237,18 +224,14 @@ elif "Marathi ↔ English" in view:
         budget_df = pd.read_sql("SELECT budget_head_code, description_marathi, amount_inr_crore FROM budget_lines", conn)
 
     with c1:
-        st.markdown('<div class="viewport-dock">', unsafe_allow_html=True)
         st.markdown("#### 🔗 Validated Cross-Language Links")
         st.caption("Matched via Levenshtein fuzzy similarity and code anchors")
         st.dataframe(links_df, width="stretch")
-        st.markdown('</div>', unsafe_allow_html=True)
 
     with c2:
-        st.markdown('<div class="viewport-dock">', unsafe_allow_html=True)
         st.markdown("#### 📖 Marathi Budget Reference Rows (Accounts Document)")
         st.caption("Primary truth records from 308-page Marathi financial book")
         st.dataframe(budget_df, width="stretch")
-        st.markdown('</div>', unsafe_allow_html=True)
 
 # -------------------------------------------------------------------
 # VIEW 5: LIVE INGEST & SEAL
@@ -256,7 +239,6 @@ elif "Marathi ↔ English" in view:
 else:
     c1, c2 = st.columns([0.48, 0.52])
     with c1:
-        st.markdown('<div class="viewport-dock">', unsafe_allow_html=True)
         st.markdown("#### 🌐 Polite Government Ingestion Test Bench")
         portal = st.selectbox(
             "Select Target Portal:",
@@ -281,10 +263,8 @@ else:
             else:
                 st.success(f"Fetched {res.size_bytes:,} bytes | SHA-256: {res.content_hash[:16]}...")
                 st.text_area("Extracted Payload Preview:", res.payload_preview, height=200)
-        st.markdown('</div>', unsafe_allow_html=True)
 
     with c2:
-        st.markdown('<div class="viewport-dock">', unsafe_allow_html=True)
         st.markdown("#### 🔒 Tamper-Proof Cryptographic Verification")
         st.caption("Verifies bit-for-bit file integrity on disk against pre-image SHA-256 hash")
         with db._get_connection() as conn:
@@ -297,4 +277,3 @@ else:
                     st.success(f"✅ Lineage verified! Disk SHA-256 matches: `{audit['computed_hash']}`")
                 else:
                     st.error("Integrity check failed.")
-        st.markdown('</div>', unsafe_allow_html=True)
