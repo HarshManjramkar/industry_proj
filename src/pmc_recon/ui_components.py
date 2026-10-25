@@ -31,23 +31,6 @@ def get_theme_css() -> str:
         box-sizing: border-box !important;
     }
 
-    /* Streamlit columns are independently scrollable; root page never scrolls */
-    [data-testid="stColumn"] {
-        max-height: calc(100vh - 135px) !important;
-        overflow-y: auto !important;
-        overflow-x: hidden !important;
-        padding-right: 8px !important;
-        scrollbar-width: thin;
-        scrollbar-color: #D4AF37 rgba(15, 23, 42, 0.6);
-    }
-    [data-testid="stColumn"]::-webkit-scrollbar {
-        width: 6px;
-    }
-    [data-testid="stColumn"]::-webkit-scrollbar-thumb {
-        background-color: #D4AF37;
-        border-radius: 4px;
-    }
-
     /* High-Density Regal Civic Top HUD */
     .regal-top-hud {
         display: flex;
@@ -57,7 +40,7 @@ def get_theme_css() -> str:
         border: 1px solid rgba(212, 175, 55, 0.35);
         border-radius: 8px;
         padding: 0.45rem 1rem;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.45rem;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     }
     .hud-brand {
@@ -105,37 +88,92 @@ def get_theme_css() -> str:
         box-shadow: 0 0 6px #10B981;
     }
 
-    /* High-Contrast Bento Cards & Story Panes */
-    .bento-card {
+    /* HIGH-CONTRAST TAB BAR & LABELS (FIX DARK-ON-DARK DEFECT) */
+    div[role="radiogroup"] {
         background: #0E172E !important;
-        border: 1px solid rgba(212, 175, 55, 0.22) !important;
-        border-radius: 8px;
-        padding: 0.85rem;
-        margin-bottom: 0.65rem;
-        color: #F8FAFC !important;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(212, 175, 55, 0.4) !important;
+        border-radius: 8px !important;
+        padding: 0.35rem 0.75rem !important;
+        margin-bottom: 0.45rem !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
     }
-    .bento-card h4 {
+    div[role="radiogroup"] label {
         color: #F8FAFC !important;
-        margin: 0 0 0.35rem 0;
-        font-size: 0.98rem;
-        font-weight: 700;
+        margin-right: 1.25rem !important;
     }
-    .bento-card p {
-        color: #CBD5E1 !important;
-        font-size: 0.84rem;
-        line-height: 1.45;
-        margin-bottom: 0.35rem;
+    div[role="radiogroup"] label p,
+    div[role="radiogroup"] label span,
+    div[role="radiogroup"] label div {
+        color: #F8FAFC !important;
+        font-size: 0.90rem !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.01em !important;
+    }
+    /* Highlight the active selected tab in bright gold */
+    div[role="radiogroup"] label:has(input:checked) p,
+    div[role="radiogroup"] label[data-checked="true"] p {
+        color: #F3C648 !important;
+        font-weight: 800 !important;
+        text-shadow: 0 0 8px rgba(243, 198, 72, 0.3) !important;
     }
 
-    /* Non-Defamatory Anomaly Cards */
+    /* Video Briefing Toggle Contrast */
+    div[data-testid="stToggle"] label p,
+    div[data-testid="stToggle"] label span {
+        color: #F8FAFC !important;
+        font-weight: 700 !important;
+        font-size: 0.90rem !important;
+    }
+
+    /* General Widget & Form Labels */
+    [data-testid="stWidgetLabel"] p,
+    [data-testid="stWidgetLabel"] span,
+    [data-testid="stWidgetLabel"] label {
+        color: #F8FAFC !important;
+        font-weight: 600 !important;
+        font-size: 0.92rem !important;
+    }
+
+    /* Headings & Captions Contrast */
+    h1, h2, h3, h4, h5, h6 {
+        color: #FFFFFF !important;
+    }
+    .stCaption, [data-testid="stCaptionContainer"] p {
+        color: #94A3B8 !important;
+        font-size: 0.84rem !important;
+    }
+
+    /* INDEPENDENT SCROLLABLE CARD CONTAINERS */
+    [data-testid="stVerticalBlockBorderWrapper"] {
+        background-color: #0E172E !important;
+        border: 1px solid rgba(212, 175, 55, 0.3) !important;
+        border-radius: 8px !important;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35) !important;
+    }
+    [data-testid="stVerticalBlockBorderWrapper"] > div {
+        scrollbar-width: thin !important;
+        scrollbar-color: #D4AF37 #0B132B !important;
+        padding: 0.65rem 0.85rem !important;
+    }
+    [data-testid="stVerticalBlockBorderWrapper"] > div::-webkit-scrollbar {
+        width: 8px !important;
+    }
+    [data-testid="stVerticalBlockBorderWrapper"] > div::-webkit-scrollbar-thumb {
+        background-color: #D4AF37 !important;
+        border-radius: 4px !important;
+    }
+    [data-testid="stVerticalBlockBorderWrapper"] > div::-webkit-scrollbar-track {
+        background-color: #0B132B !important;
+    }
+
+    /* Anomaly Cards Inside Scrollable Panes */
     .anomaly-card {
-        background: #0F1B38 !important;
+        background: #0A1128 !important;
         border-radius: 8px;
         padding: 0.85rem 1rem;
-        margin-bottom: 0.65rem;
+        margin-bottom: 0.75rem;
         color: #F8FAFC !important;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.12);
     }
     .anomaly-card h4 {
         margin: 0 0 0.4rem 0;
@@ -153,12 +191,12 @@ def get_theme_css() -> str:
     .card-r3 { border-left: 4px solid #F59E0B !important; }
     .card-r6 { border-left: 4px solid #F87171 !important; }
 
-    /* Radar Results Pill Grid */
+    /* Radar Results Header Box */
     .radar-summary-box {
         background: linear-gradient(135deg, #0B142B 0%, #131F3F 100%);
         border: 1px solid rgba(212, 175, 55, 0.4);
         border-radius: 8px;
-        padding: 0.85rem;
+        padding: 0.75rem 0.85rem;
         margin-bottom: 0.75rem;
     }
     .radar-badge {
@@ -173,15 +211,6 @@ def get_theme_css() -> str:
     .radar-pass { background: rgba(16, 185, 129, 0.2); color: #34D399; border: 1px solid #10B981; }
     .radar-alert { background: rgba(245, 158, 11, 0.2); color: #FBBF24; border: 1px solid #F59E0B; }
     .radar-outlier { background: rgba(239, 68, 68, 0.2); color: #F87171; border: 1px solid #EF4444; }
-
-    /* Radio / Segmented Control Styling */
-    div[role="radiogroup"] {
-        background: #0B132B !important;
-        border: 1px solid rgba(212, 175, 55, 0.3) !important;
-        border-radius: 8px !important;
-        padding: 0.25rem 0.5rem !important;
-        margin-bottom: 0.4rem !important;
-    }
 </style>
 """
 
