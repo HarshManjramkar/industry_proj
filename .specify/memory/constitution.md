@@ -1,8 +1,8 @@
-# Repo Constitution & Development Process (Devang Manjramkar Flow)
+# Repo Constitution & Development Process (Harsh Manjramkar Flow)
 
 > [!IMPORTANT]
 > This Constitution is the binding, inviolable law for all agents working in this repository.
-> The architecture and development lifecycle strictly follow the Devang Manjramkar SDLC Flow.
+> The architecture and development lifecycle strictly follow the Harsh Manjramkar SDLC Flow.
 > **Only one human is in the loop (Client / UAT Signoff)**. All other engineering, architectural, testing, and operational roles are performed autonomously by BMad agents adhering to this document.
 
 ---
@@ -111,7 +111,7 @@
 ## Integration with BMad v7 Architecture, TEA & CIS
 
 ### BMad v7 Working Philosophy
-BMad v7 introduces **Agent-as-Code**, decoupled modular suites, and first-class execution guardrails. In this repository, v7 operates under strict mechanical subordination to the Devang Manjramkar Flow:
+BMad v7 introduces **Agent-as-Code**, decoupled modular suites, and first-class execution guardrails. In this repository, v7 operates under strict mechanical subordination to the Harsh Manjramkar Flow:
 1. **Decoupled Architecture**: Planning, verification, implementation, and quality auditing are separated into specialized modules (`bmm`, `bmb`, `tea`, `cis`).
 2. **Deterministic Context**: Agents never inspect raw code without first loading their associated story file, schema contracts, and oracle tests.
 

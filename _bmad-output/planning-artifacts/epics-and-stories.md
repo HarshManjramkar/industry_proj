@@ -1,6 +1,6 @@
 # Epics and Stories Breakdown: PMC Procurement Reconciliation Tool
 
-This breakdown shards the requirements from the PRD and PDR into atomic, testable user stories adhering to the **Devang Manjramkar Flow** and **Story Snacking** principles.
+This breakdown shards the requirements from the PRD and PDR into atomic, testable user stories adhering to the **Harsh Manjramkar Flow** and **Story Snacking** principles.
 
 ---
 

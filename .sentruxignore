@@ -1,0 +1,9 @@
+.agent/
+.agents/
+.claude/
+_bmad/
+.venv/
+.bin/
+.semgrep/
+.specify/
+_bmad-output/

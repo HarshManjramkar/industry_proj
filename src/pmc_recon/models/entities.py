@@ -1,5 +1,5 @@
 """Strict Pydantic Data Models and Contracts for PMC Procurement Reconciliation.
-Complies with Article II of Project Constitution and Devang Manjramkar Flow.
+Complies with Article II of Project Constitution and Harsh Manjramkar Flow.
 """
 
 from datetime import datetime, date, timezone

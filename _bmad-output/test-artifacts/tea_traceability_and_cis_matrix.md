@@ -1,7 +1,7 @@
 # TEA (Test Engineering Architect) & CIS Quality Strategy
 
 **Author:** Murat (Master Test Architect) & CIS Innovation Suite  
-**Repository Standard:** Devang Manjramkar Flow & Article V of Constitution  
+**Repository Standard:** Harsh Manjramkar Flow & Article V of Constitution  
 **Traceability Reference:** PRD v0.1 & PDR v0.2
 
 ---
