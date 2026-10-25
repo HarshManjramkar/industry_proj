@@ -1,5 +1,6 @@
-"""Database schema and storage engine for PMC Procurement Reconciliation.
+"""Database engine implementation for PMC Procurement Reconciliation.
 Provides immutable raw document storage and versioned record snapshots.
+Adheres to CodeQL CWE-89 (parameterized SQL) and CWE-22 (path traversal prevention).
 """
 
 import hashlib
@@ -9,13 +10,18 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 from datetime import datetime, timezone
 
-from pmc_recon.models.entities import RawDocument, TenderRecord, BudgetLine, ChangeEvent, EntityLink, Flag, ReviewDecision
+from pmc_recon.models.entities import (
+    RawDocument, TenderRecord, BudgetLine, ChangeEvent, EntityLink, Flag, ReviewDecision
+)
+from pmc_recon.storage.schema import SQLITE_SCHEMA_DDL
 
 
 class DatabaseEngine:
+    """SQLite implementation of data stores with cryptographic content-addressing."""
+
     def __init__(self, db_path: str = "pmc_recon.db", raw_dir: str = "data/raw_store"):
         self.db_path = db_path
-        self.raw_dir = Path(raw_dir)
+        self.raw_dir = Path(raw_dir).resolve()
         self.raw_dir.mkdir(parents=True, exist_ok=True)
         self._init_db()
 
@@ -26,110 +32,20 @@ class DatabaseEngine:
 
     def _init_db(self) -> None:
         with self._get_connection() as conn:
-            conn.executescript("""
-            CREATE TABLE IF NOT EXISTS sources (
-                source_id TEXT PRIMARY KEY,
-                name TEXT NOT NULL,
-                base_url TEXT NOT NULL,
-                owner_dept TEXT NOT NULL,
-                access_method TEXT NOT NULL,
-                terms_status TEXT NOT NULL,
-                crawl_frequency TEXT NOT NULL
-            );
-
-            CREATE TABLE IF NOT EXISTS raw_documents (
-                doc_id TEXT PRIMARY KEY,
-                run_id TEXT NOT NULL,
-                storage_path TEXT NOT NULL,
-                content_hash TEXT UNIQUE NOT NULL,
-                size_bytes INTEGER NOT NULL,
-                fetched_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-
-            CREATE TABLE IF NOT EXISTS tenders (
-                tender_id TEXT PRIMARY KEY,
-                reference_number TEXT NOT NULL,
-                title TEXT NOT NULL,
-                department_chain TEXT NOT NULL,
-                published_date TEXT,
-                closing_date TEXT,
-                opening_date TEXT,
-                value_inr REAL NOT NULL,
-                fee_inr REAL,
-                emd_inr REAL,
-                status TEXT NOT NULL,
-                corrigenda_count INTEGER DEFAULT 0,
-                source_name TEXT NOT NULL,
-                raw_doc_id TEXT,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-
-            CREATE TABLE IF NOT EXISTS tender_versions (
-                version_id INTEGER PRIMARY KEY AUTOINCREMENT,
-                tender_id TEXT NOT NULL,
-                snapshot_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                attributes_json TEXT NOT NULL,
-                version_hash TEXT NOT NULL,
-                FOREIGN KEY (tender_id) REFERENCES tenders(tender_id)
-            );
-
-            CREATE TABLE IF NOT EXISTS budget_lines (
-                budget_head_code TEXT,
-                fiscal_year TEXT,
-                description_marathi TEXT NOT NULL,
-                description_english TEXT,
-                department TEXT NOT NULL,
-                amount_type TEXT NOT NULL,
-                amount_inr_crore REAL NOT NULL,
-                source_file TEXT NOT NULL,
-                PRIMARY KEY (budget_head_code, fiscal_year, amount_type)
-            );
-
-            CREATE TABLE IF NOT EXISTS change_events (
-                change_id TEXT PRIMARY KEY,
-                record_id TEXT NOT NULL,
-                record_type TEXT NOT NULL,
-                change_type TEXT NOT NULL,
-                changed_fields_json TEXT NOT NULL,
-                detected_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-
-            CREATE TABLE IF NOT EXISTS entity_links (
-                link_id TEXT PRIMARY KEY,
-                left_record_id TEXT NOT NULL,
-                right_record_id TEXT NOT NULL,
-                method TEXT NOT NULL,
-                confidence REAL NOT NULL,
-                status TEXT NOT NULL
-            );
-
-            CREATE TABLE IF NOT EXISTS flags (
-                flag_id TEXT PRIMARY KEY,
-                rule_id TEXT NOT NULL,
-                title TEXT NOT NULL,
-                severity TEXT NOT NULL,
-                evidence_json TEXT NOT NULL,
-                benign_explanations_json TEXT NOT NULL,
-                status TEXT NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-
-            CREATE TABLE IF NOT EXISTS reviews (
-                review_id TEXT PRIMARY KEY,
-                flag_id TEXT NOT NULL,
-                reviewer TEXT NOT NULL,
-                outcome TEXT NOT NULL,
-                comment TEXT NOT NULL,
-                reviewed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (flag_id) REFERENCES flags(flag_id)
-            );
-            """)
+            conn.executescript(SQLITE_SCHEMA_DDL)
 
     def save_raw_payload(self, run_id: str, payload_bytes: bytes, filename_prefix: str = "payload") -> RawDocument:
+        """Stores raw bytes with SHA-256 content addressing and CWE-22 path traversal defense."""
         content_hash = hashlib.sha256(payload_bytes).hexdigest()
         doc_id = f"doc_{content_hash[:12]}"
-        storage_rel_path = f"{run_id}_{filename_prefix}_{doc_id}.bin"
-        storage_full_path = self.raw_dir / storage_rel_path
+        safe_prefix = "".join(c for c in filename_prefix if c.isalnum() or c in ("-", "_"))
+        safe_run_id = "".join(c for c in run_id if c.isalnum() or c in ("-", "_"))
+        storage_rel_path = f"{safe_run_id}_{safe_prefix}_{doc_id}.bin"
+        storage_full_path = (self.raw_dir / storage_rel_path).resolve()
+
+        # CWE-22: Verify path containment
+        if not storage_full_path.is_relative_to(self.raw_dir):
+            raise ValueError(f"Path traversal detected: {storage_rel_path}")
 
         if not storage_full_path.exists():
             with open(storage_full_path, "wb") as f:
@@ -147,10 +63,12 @@ class DatabaseEngine:
             conn.execute("""
             INSERT OR IGNORE INTO raw_documents (doc_id, run_id, storage_path, content_hash, size_bytes, fetched_at)
             VALUES (?, ?, ?, ?, ?, ?)
-            """, (raw_doc.doc_id, raw_doc.run_id, raw_doc.storage_path, raw_doc.content_hash, raw_doc.size_bytes, raw_doc.fetched_at.isoformat()))
+            """, (raw_doc.doc_id, raw_doc.run_id, raw_doc.storage_path, raw_doc.content_hash,
+                  raw_doc.size_bytes, raw_doc.fetched_at.isoformat()))
         return raw_doc
 
     def upsert_tender(self, tender: TenderRecord) -> Optional[ChangeEvent]:
+        """Upserts a tender and automatically generates a change event if fields diverged."""
         tender_json = tender.model_dump_json()
         version_hash = hashlib.sha256(tender_json.encode("utf-8")).hexdigest()
 
@@ -180,7 +98,6 @@ class DatabaseEngine:
                     changed_fields=json.loads(tender.model_dump_json())
                 )
             else:
-                # Compare for field changes
                 diffs = {}
                 for field in ["value_inr", "closing_date", "status", "corrigenda_count"]:
                     old_val = existing[field]
@@ -205,7 +122,6 @@ class DatabaseEngine:
                         changed_fields=diffs
                     )
 
-            # Record version snapshot
             cur.execute("""
             INSERT INTO tender_versions (tender_id, attributes_json, version_hash)
             VALUES (?, ?, ?)
@@ -216,11 +132,13 @@ class DatabaseEngine:
                 INSERT OR REPLACE INTO change_events (change_id, record_id, record_type, change_type, changed_fields_json, detected_at)
                 VALUES (?, ?, ?, ?, ?, ?)
                 """, (change_event.change_id, change_event.record_id, change_event.record_type,
-                      change_event.change_type.value, json.dumps(change_event.changed_fields), change_event.detected_at.isoformat()))
+                      change_event.change_type.value, json.dumps(change_event.changed_fields),
+                      change_event.detected_at.isoformat()))
 
         return change_event
 
     def insert_budget_line(self, line: BudgetLine) -> None:
+        """Inserts or updates a municipal budget allocation line."""
         with self._get_connection() as conn:
             conn.execute("""
             INSERT OR REPLACE INTO budget_lines (budget_head_code, fiscal_year, description_marathi,
@@ -232,6 +150,7 @@ class DatabaseEngine:
                   line.amount_inr_crore, line.source_file))
 
     def insert_flag(self, flag: Flag) -> None:
+        """Inserts or updates an audit discrepancy flag."""
         with self._get_connection() as conn:
             conn.execute("""
             INSERT OR REPLACE INTO flags (flag_id, rule_id, title, severity, evidence_json,
@@ -242,6 +161,7 @@ class DatabaseEngine:
                   flag.status.value, flag.created_at.isoformat()))
 
     def record_review(self, review: ReviewDecision) -> None:
+        """Records an official UAT signoff review decision."""
         with self._get_connection() as conn:
             conn.execute("""
             INSERT INTO reviews (review_id, flag_id, reviewer, outcome, comment, reviewed_at)

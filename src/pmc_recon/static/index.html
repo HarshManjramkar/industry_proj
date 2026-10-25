@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PMC Procurement Reconciliation Command Center</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body style="overflow: hidden;">
+  <div class="app-viewport">
+    <!-- TOP COMMAND BAR -->
+    <header class="command-header">
+      <div class="brand-mark">
+        <div class="pulse-dot"></div>
+        <div class="brand-title">
+          <span>PMC Recon</span>
+          <span class="brand-badge">Audit Kernel v1.0</span>
+        </div>
+      </div>
+      <div class="header-metrics">
+        <div class="metric-pill"><span>Tenders Tracked:</span><span id="metric-tenders" class="metric-val">-</span></div>
+        <div class="metric-pill"><span>Budget Heads:</span><span id="metric-budget" class="metric-val">-</span></div>
+        <div class="metric-pill"><span>Entity Correlated:</span><span id="metric-links" class="metric-val">-</span></div>
+        <div class="metric-pill"><span>Active Discrepancies:</span><span id="metric-flags" class="metric-val" style="color:var(--accent-rose);">-</span></div>
+      </div>
+      <div class="user-badge">
+        <span style="color:var(--accent-cyan);">●</span>
+        <span>Reviewer: <strong>Harsh Manjramkar</strong></span>
+      </div>
+    </header>
+
+    <!-- MAIN 3-PANE ZERO-SCROLL WORKSPACE -->
+    <main class="workspace-grid">
+      <!-- LEFT PANE: ANOMALY QUEUE -->
+      <section class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Audit Flag Queue</div>
+          <span id="flag-count-badge" class="brand-badge" style="background:rgba(244,63,94,0.1); color:var(--accent-rose); border-color:rgba(244,63,94,0.3);">0 Open</span>
+        </div>
+        <div id="anomaly-list" class="panel-body">
+          <div style="color:var(--text-muted); font-size:12px; text-align:center; padding:20px;">Scanning pipeline for discrepancies...</div>
+        </div>
+      </section>
+
+      <!-- CENTER PANE: DATA REPOSITORY EXPLORER -->
+      <section class="panel">
+        <div class="tabs-bar">
+          <button class="tab-btn active" onclick="switchView('tenders')">Tenders Notice Store</button>
+          <button class="tab-btn" onclick="switchView('budget')">PMC Municipal Budget</button>
+          <button class="tab-btn" onclick="switchView('links')">Entity Match Ledger</button>
+        </div>
+        <div id="grid-view" class="panel-body" style="padding:0;"></div>
+      </section>
+
+      <!-- RIGHT PANE: ADJUDICATION & BENIGN DOSSIER -->
+      <section class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Evidence & Adjudication</div>
+        </div>
+        <div id="adjudication-panel" class="panel-body">
+          <div class="dossier-section">
+            <div class="dossier-label">Active Discrepancy</div>
+            <div id="target-title" class="dossier-value" style="font-weight:700;">Select an anomaly from the queue</div>
+          </div>
+          <div class="dossier-section">
+            <div class="dossier-label">Raw Cryptographic Evidence</div>
+            <pre id="target-evidence" class="code-box">{}</pre>
+          </div>
+          <div class="dossier-section">
+            <div class="dossier-label">Benign / Innocent Explanations (Pre-Approved)</div>
+            <div id="target-explanations" class="dossier-value" style="font-size:12px; color:var(--text-secondary);">
+              <div>• Awaiting selection</div>
+            </div>
+          </div>
+          <div class="dossier-section" style="margin-top:24px;">
+            <button id="btn-resolve" class="action-btn" disabled onclick="resolveCurrentFlag()">Mark Anomaly as Explained</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- FOOTER STATUS -->
+    <footer class="command-footer">
+      <div>PMC Water Supply & Accounts Department · Continuous Procurement Reconciliation</div>
+      <div>Zero-UB Affine Logic · SHA-256 Pre-Image Bound · Fixed-Point Integer Currency</div>
+    </footer>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
