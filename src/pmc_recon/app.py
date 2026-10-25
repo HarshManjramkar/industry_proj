@@ -169,6 +169,23 @@ with tabs[1]:
     </div>
     """, unsafe_allow_html=True)
 
+    st.markdown("---")
+    st.markdown("#### 📥 Export Standalone Auditor Evidence Dossier (FR-14)")
+    with db._get_connection() as conn:
+        flags_rows = conn.execute("SELECT flag_id, rule_id, title FROM flags").fetchall()
+    if flags_rows:
+        flag_options = {f"{r['rule_id']}: {r['title']}": r["flag_id"] for r in flags_rows}
+        chosen_label = st.selectbox("Select Anomaly to Generate Audit Dossier:", list(flag_options.keys()))
+        chosen_flag_id = flag_options[chosen_label]
+        from pmc_recon.reporting.evidence import EvidenceReporter
+        dossier_text = EvidenceReporter(db).generate_flag_dossier(chosen_flag_id)
+        st.download_button(
+            label=f"📄 Download Audit Evidence Sheet ({chosen_flag_id}.md)",
+            data=dossier_text,
+            file_name=f"audit_dossier_{chosen_flag_id}.md",
+            mime="text/markdown"
+        )
+
 # ---------------------------------------------------------
 # TAB 3: VISUAL CHARTS & GRAPHS
 # ---------------------------------------------------------
