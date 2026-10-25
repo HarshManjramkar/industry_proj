@@ -24,7 +24,7 @@ echo "[3/4] Running Sentrux Structural Health & Modularity Sensor..."
 echo "  ✓ Sentrux structural checks completed."
 
 echo "[4/4] Executing Test Oracles (Verification Precedence)..."
-PYTHONPATH="$PROJECT_ROOT/src" "$PROJECT_ROOT/.venv/bin/pytest" "$PROJECT_ROOT/tests" -q
+PYTHONPATH="$PROJECT_ROOT/src:$PROJECT_ROOT" "$PROJECT_ROOT/.venv/bin/pytest" "$PROJECT_ROOT/tests" -q
 echo "  ✓ All Test Oracles passed."
 
 echo "============================================="

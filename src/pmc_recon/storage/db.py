@@ -177,7 +177,7 @@ class DatabaseEngine:
                     record_id=tender.tender_id,
                     record_type="tender",
                     change_type="new",
-                    changed_fields={"initial": tender.model_dump()}
+                    changed_fields=json.loads(tender.model_dump_json())
                 )
             else:
                 # Compare for field changes
