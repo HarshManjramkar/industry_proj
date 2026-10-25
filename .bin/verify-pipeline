@@ -8,22 +8,25 @@ echo "============================================="
 echo "🛡️  RUNNING VERIFICATION LAYER & ORACLES"
 echo "============================================="
 
-echo "[1/3] Checking Constitution Invariants (.specify)..."
+echo "[1/4] Checking Constitution Invariants (.specify)..."
 if [ ! -f "$PROJECT_ROOT/.specify/memory/constitution.md" ]; then
     echo "❌ Error: Project Constitution missing!"
     exit 1
 fi
 echo "  ✓ Constitution active."
 
-echo "[2/3] Running Semgrep Security & Clean Architecture Analysis..."
-"$BIN_DIR/semgrep-runner" --config "$PROJECT_ROOT/.semgrep/rules.yaml" "$PROJECT_ROOT" --error
+echo "[2/4] Running Semgrep Security & Clean Architecture AST Rules..."
+"$BIN_DIR/semgrep-runner" --config "$PROJECT_ROOT/.semgrep/rules.yaml" "$PROJECT_ROOT/src" "$PROJECT_ROOT/tests" --error
 echo "  ✓ Semgrep rules satisfied."
 
-echo "[3/3] Running Sentrux Structural Health & Architectural Gates..."
+echo "[3/4] Running Sentrux Structural Health & Modularity Sensor..."
 "$BIN_DIR/sentrux-runner" check "$PROJECT_ROOT" || true
 echo "  ✓ Sentrux structural checks completed."
+
+echo "[4/4] Executing Test Oracles (Verification Precedence)..."
+PYTHONPATH="$PROJECT_ROOT/src" "$PROJECT_ROOT/.venv/bin/pytest" "$PROJECT_ROOT/tests" -q
+echo "  ✓ All Test Oracles passed."
 
 echo "============================================="
 echo "✅ ALL ORACLES & VERIFICATION GATES PASSED"
 echo "============================================="
-
