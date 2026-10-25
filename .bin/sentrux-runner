@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+export SENTRUX_SKIP_GRAMMAR_DOWNLOAD=1
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export PATH="$SCRIPT_DIR:$PATH"
+exec "$SCRIPT_DIR/sentrux" "$@"

@@ -1,0 +1,6 @@
+# Sentrux Architectural Rules
+[rules]
+max_cyclomatic_complexity = 15
+max_file_lines = 400
+no_circular_dependencies = true
+min_modularity_score = 0.65

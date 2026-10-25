@@ -1,0 +1,10 @@
+2026-10-25 21:19:27,958 - semgrep.output - INFO - ✅ Scan completed successfully.
+ • Findings: 0 (0 blocking)
+ • Rules run: 2
+ • Targets scanned: 131
+ • Parsed lines: ~100.0%
+ • Scan skipped: 
+   ◦ Files larger than  files 1.0 MB: 25
+   ◦ Files matching .semgrepignore patterns: 67
+ • For a detailed list of skipped files and lines, run semgrep with the --verbose flag
+Ran 2 rules on 131 files: 0 findings.

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+mkdir -p "$PROJECT_ROOT/.semgrep_home"
+export HOME="$PROJECT_ROOT/.semgrep_home"
+export SEMGREP_USER_AGENT_APPEND="bmad-pipeline"
+export SEMGREP_SEND_METRICS=off
+export SEMGREP_ENABLE_VERSION_CHECK=0
+exec "$PROJECT_ROOT/.venv/bin/semgrep" --metrics=off "$@"

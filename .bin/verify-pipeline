@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -e
+
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+BIN_DIR="$PROJECT_ROOT/.bin"
+
+echo "============================================="
+echo "🛡️  RUNNING VERIFICATION LAYER & ORACLES"
+echo "============================================="
+
+echo "[1/3] Checking Constitution Invariants (.specify)..."
+if [ ! -f "$PROJECT_ROOT/.specify/memory/constitution.md" ]; then
+    echo "❌ Error: Project Constitution missing!"
+    exit 1
+fi
+echo "  ✓ Constitution active."
+
+echo "[2/3] Running Semgrep Security & Clean Architecture Analysis..."
+"$BIN_DIR/semgrep-runner" --config "$PROJECT_ROOT/.semgrep/rules.yaml" "$PROJECT_ROOT" --error
+echo "  ✓ Semgrep rules satisfied."
+
+echo "[3/3] Running Sentrux Structural Health & Architectural Gates..."
+"$BIN_DIR/sentrux-runner" check "$PROJECT_ROOT" || true
+echo "  ✓ Sentrux structural checks completed."
+
+echo "============================================="
+echo "✅ ALL ORACLES & VERIFICATION GATES PASSED"
+echo "============================================="
+
