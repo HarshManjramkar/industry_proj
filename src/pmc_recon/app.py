@@ -14,12 +14,14 @@ if str(_SRC_DIR) not in sys.path:
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(1, str(_REPO_ROOT))
 
+from unittest.mock import MagicMock
 import pandas as pd
 import streamlit as st
-from unittest.mock import MagicMock
 
 from pmc_recon.ingest.crawler_service import CrawlerDemoService
+from pmc_recon.reporting.evidence import EvidenceReporter
 from pmc_recon.storage.db import DatabaseEngine
+from pmc_recon.ui_components import get_theme_css, render_intro_video_walkthrough, render_regal_banner
 from tests.fixtures.mock_data import MOCK_MAHATENDERS_HTML
 
 st.set_page_config(
@@ -28,45 +30,47 @@ st.set_page_config(
     layout="wide"
 )
 
-# Custom High-Impact Layman Styling
-st.markdown("""
-<style>
-    .main-title { font-size: 2.2rem; font-weight: 800; color: #1E3A8A; margin-bottom: 0.2rem; }
-    .sub-title { font-size: 1.1rem; color: #4B5563; margin-bottom: 1.5rem; }
-    .story-card { background-color: #F8FAFC; border-left: 5px solid #2563EB; padding: 1.2rem; border-radius: 8px; margin-bottom: 1rem; }
-    .alert-card-r1 { background-color: #EFF6FF; border-left: 5px solid #3B82F6; padding: 1rem; border-radius: 6px; }
-    .alert-card-r3 { background-color: #FEF3C7; border-left: 5px solid #F59E0B; padding: 1rem; border-radius: 6px; }
-    .alert-card-r6 { background-color: #FEE2E2; border-left: 5px solid #EF4444; padding: 1rem; border-radius: 6px; }
-    .badge-pill { display: inline-block; padding: 4px 10px; border-radius: 12px; font-weight: 600; font-size: 0.85rem; }
-</style>
-""", unsafe_allow_html=True)
+# Apply Theme-Adaptive (Dark & Light Mode) CSS
+st.markdown(get_theme_css(), unsafe_allow_html=True)
 
-st.markdown('<div class="main-title">🏛️ Pune City Expenditure & Tender Verification</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-title">Citizen-Facing Independent Verification of Pune Municipal Corporation (PMC) Water Supply & Accounts Data</div>', unsafe_allow_html=True)
+# Regal Municipal Header & System Pulse
+st.markdown(render_regal_banner(), unsafe_allow_html=True)
+
+# Video Briefing Walkthrough Hero
+st.markdown(render_intro_video_walkthrough(), unsafe_allow_html=True)
 
 db = DatabaseEngine()
 crawler_service = CrawlerDemoService(db=db)
 
-# Top Civic Overview Cards
-col1, col2, col3, col4 = st.columns(4)
-col1.metric("Monitored Budget", "₹ 2,077.43 Cr", help="Total Water Supply Allocation in PMC Annual Budget")
-col2.metric("Civic Zones Covered", "141 Zones", help="368 District Metered Areas across Pune")
-col3.metric("Live Tenders Cross-Checked", "2 Major Contracts", help="Water pipeline laying in Wagholi & Baner")
-col4.metric("Discrepancies Flagged", "3 Critical Items", help="Arithmetic slips, mirror mismatches, and data entry outliers")
+# 4 Key Civic Widgets on First Page
+c1, c2, c3, c4 = st.columns(4)
+c1.metric("Monitored Budget", "₹ 2,077.43 Cr", help="Total Water Supply Allocation in PMC Annual Budget")
+c2.metric("Civic Zones Covered", "141 Zones", help="368 District Metered Areas across Pune")
+c3.metric("Live Tenders Cross-Checked", "2 Contracts", help="Water pipeline laying in Wagholi & Baner")
+c4.metric("Discrepancies Flagged", "3 Critical Items", help="Addition slips, mirror mismatches, and data entry outliers")
 
-# Layman Navigation Tabs
-tabs = st.tabs([
-    "🔍 1. What Are We Crawling?",
-    "🚨 2. The 3 Verified Discrepancies",
-    "📊 3. Visual Charts & Budget Breakdown",
-    "🔗 4. Marathi ↔ English Project Linker",
-    "🌐 5. Live Portal Crawler Test"
-])
+st.markdown("<br>", unsafe_allow_html=True)
+
+# Layman Bento Card Navigation Hub
+st.markdown("### 🗂️ Explore the Civic Investigation by Module")
+view_selection = st.radio(
+    "Select a forensic view to inspect:",
+    [
+        "🔍 1. What Are We Crawling? (Public Data Sources)",
+        "🚨 2. The 3 Verified Discrepancies (Real-World Cases)",
+        "📊 3. Visual Charts & Outlier Graphs (Layman Data View)",
+        "🔗 4. Marathi ↔ English Project Linker (Language Bridge)",
+        "🌐 5. Live Public Portal Ingestion (Live Crawler & Seal)"
+    ],
+    horizontal=True
+)
+
+st.markdown("---")
 
 # ---------------------------------------------------------
-# TAB 1: WHAT ARE WE CRAWLING?
+# VIEW 1: WHAT ARE WE CRAWLING?
 # ---------------------------------------------------------
-with tabs[0]:
+if "1. What Are We Crawling?" in view_selection:
     st.subheader("Public Data Sources Tracked by This System")
     st.markdown(
         "By law, municipal corporations must publish budget books and procurement tenders. "
@@ -77,53 +81,51 @@ with tabs[0]:
     sc1, sc2, sc3 = st.columns(3)
     with sc1:
         st.markdown("""
-        <div class="story-card">
+        <div class="bento-card">
             <h4>📄 Source A: Municipal Budget Books</h4>
             <p><b>Where from:</b> PMC Official Portal & OpenCity.in</p>
             <p><b>What is inside:</b> 308-page Marathi financial document detailing official allocations (<i>'नक्की आकडा'</i>) for water works under budget codes like <code>RI11A101</code>.</p>
-            <span class="badge-pill" style="background:#DBEAFE; color:#1E40AF;">Reference Truth</span>
+            <span style="background: rgba(37,99,235,0.2); color:#3B82F6; padding: 4px 8px; border-radius: 6px; font-weight:600; font-size:0.85rem;">Reference Truth</span>
         </div>
         """, unsafe_allow_html=True)
 
     with sc2:
         st.markdown("""
-        <div class="story-card">
+        <div class="bento-card">
             <h4>🌐 Source B: Maharashtra e-Tenders</h4>
             <p><b>Where from:</b> <code>mahatenders.gov.in</code> (NIC)</p>
             <p><b>What is inside:</b> The official government contract bidding portal. Lists tenders for laying pipelines and installing digital meters in English.</p>
-            <span class="badge-pill" style="background:#D1FAE5; color:#065F46;">Live Bidding Portal</span>
+            <span style="background: rgba(16,185,129,0.2); color:#10B981; padding: 4px 8px; border-radius: 6px; font-weight:600; font-size:0.85rem;">Live Bidding Portal</span>
         </div>
         """, unsafe_allow_html=True)
 
     with sc3:
         st.markdown("""
-        <div class="story-card">
+        <div class="bento-card">
             <h4>🪞 Source C: Public Mirror Portals</h4>
             <p><b>Where from:</b> <code>publicservicesmap.in</code></p>
             <p><b>What is inside:</b> Civic watchdog and contractor tracking portals that mirror PMC government tenders for public visibility.</p>
-            <span class="badge-pill" style="background:#FEF3C7; color:#92400E;">Public Mirror Watch</span>
+            <span style="background: rgba(245,158,11,0.2); color:#F59E0B; padding: 4px 8px; border-radius: 6px; font-weight:600; font-size:0.85rem;">Public Mirror Watch</span>
         </div>
         """, unsafe_allow_html=True)
 
-    st.markdown("---")
-    st.markdown("### ❓ Why focus on Water Supply and not Municipal Elections?")
-    st.info(
-        "**Key Finding from the PDR (Decision D1):** When inspecting municipal data, civic researchers often look for election spending. "
-        "However, our investigation discovered that **PMC has no municipal election budget line item** in its ₹2,077 Cr budget! "
-        "Pune election tenders are published by the **District Collector's Office** (`RFCP` prefix), not the Municipal Corporation (`PMCP`). "
-        "Water Supply, on the other hand, directly impacts 4.5 million Pune residents across 141 zones (Wagholi, Lohegaon, Baner, Kothrud) with active public tenders."
-    )
+    with st.expander("❓ Why focus on Water Supply and NOT Municipal Elections? (PDR Finding)"):
+        st.info(
+            "**Key Finding from the PDR (Decision D1):** When inspecting municipal data, civic researchers often look for election spending. "
+            "However, our investigation discovered that **PMC has no municipal election budget line item** in its ₹2,077 Cr budget! "
+            "Pune election tenders are published by the **District Collector's Office** (`RFCP` prefix), not the Municipal Corporation (`PMCP`). "
+            "Water Supply, on the other hand, directly impacts 4.5 million Pune residents across 141 zones (Wagholi, Lohegaon, Baner) with active public tenders."
+        )
 
 # ---------------------------------------------------------
-# TAB 2: THE 3 VERIFIED DISCREPANCIES
+# VIEW 2: THE 3 VERIFIED DISCREPANCIES
 # ---------------------------------------------------------
-with tabs[1]:
+elif "2. The 3 Verified Discrepancies" in view_selection:
     st.subheader("Real-World Discrepancies Discovered (As Identified in the PDR & PRD)")
     st.markdown("Our engine found three specific inconsistencies across public documents. Here is what happened in plain language:")
 
-    # Case 1: Rule R3
     st.markdown("""
-    <div class="alert-card-r3">
+    <div class="anomaly-card card-r3">
         <h4>1. The ₹ 40 Lakh Budget Addition Slip (Rule R3: Arithmetic Invariant)</h4>
         <p><b>Where it happened:</b> In the official Municipal Budget presentation slides for the Electrical Department.</p>
         <p><b>The Issue:</b> The presentation lists two parts:
@@ -137,11 +139,8 @@ with tabs[1]:
     </div>
     """, unsafe_allow_html=True)
 
-    st.write("")
-
-    # Case 2: Rule R1
     st.markdown("""
-    <div class="alert-card-r1">
+    <div class="anomaly-card card-r1">
         <h4>2. The ₹ 70 Lakh Tender Value Mismatch (Rule R1: Cross-Portal Sync Mismatch)</h4>
         <p><b>Where it happened:</b> Tender <code>PMCP/WTR/2026/042</code> for trunk pipeline laying in Wagholi-Lohegaon.</p>
         <p><b>The Issue:</b>
@@ -153,11 +152,8 @@ with tabs[1]:
     </div>
     """, unsafe_allow_html=True)
 
-    st.write("")
-
-    # Case 3: Rule R6
     st.markdown("""
-    <div class="alert-card-r6">
+    <div class="anomaly-card card-r6">
         <h4>3. The Impossible 450 km Water Pipeline (Rule R6: Statistical Outlier / Typo)</h4>
         <p><b>Where it happened:</b> Lohegaon-Wagholi water distribution pipeline specification table.</p>
         <p><b>The Issue:</b> Across Pune's 141 water sectors, pipeline lengths range between <b>16.5 km and 77 km</b>.
@@ -177,7 +173,6 @@ with tabs[1]:
         flag_options = {f"{r['rule_id']}: {r['title']}": r["flag_id"] for r in flags_rows}
         chosen_label = st.selectbox("Select Anomaly to Generate Audit Dossier:", list(flag_options.keys()))
         chosen_flag_id = flag_options[chosen_label]
-        from pmc_recon.reporting.evidence import EvidenceReporter
         dossier_text = EvidenceReporter(db).generate_flag_dossier(chosen_flag_id)
         st.download_button(
             label=f"📄 Download Audit Evidence Sheet ({chosen_flag_id}.md)",
@@ -187,18 +182,17 @@ with tabs[1]:
         )
 
 # ---------------------------------------------------------
-# TAB 3: VISUAL CHARTS & GRAPHS
+# VIEW 3: VISUAL CHARTS & OUTLIER GRAPHS
 # ---------------------------------------------------------
-with tabs[2]:
+elif "3. Visual Charts" in view_selection:
     st.subheader("Visualizing the Data for Laymen")
 
     col_g1, col_g2 = st.columns(2)
-
     with col_g1:
         st.markdown("#### 💧 PMC Water Supply Budget (₹ 2,077.43 Cr Total)")
         st.caption("Capital infrastructure projects vs. day-to-day revenue operations & maintenance")
         budget_chart_data = pd.DataFrame({
-            "Budget Category": ["Capital Infrastructure (Pipes, Tanks, DMAs)", "Revenue Operations (Pumping, Electricity, Staff)"],
+            "Budget Category": ["Capital Works (Pipes & Tanks)", "Revenue Operations (Pumping & Maintenance)"],
             "Amount (₹ Crores)": [802.78, 1274.65]
         })
         st.bar_chart(budget_chart_data.set_index("Budget Category"))
@@ -207,14 +201,13 @@ with tabs[2]:
         st.markdown("#### 🚨 The 450 km Outlier Detected by Rule R6")
         st.caption("Notice how Lohegaon (450 km) absurdly spikes against all peer Pune sector works!")
         pipeline_lengths = pd.DataFrame({
-            "Water Sector / Village": ["Baner DMA", "Kothrud Trunk", "Hadapsar Network", "Katraj Reservoir", "Sinhagad Main", "Lohegaon-Wagholi (OUTLIER)"],
+            "Water Sector": ["Baner", "Kothrud", "Hadapsar", "Katraj", "Sinhagad", "Lohegaon (OUTLIER)"],
             "Pipeline Length (km)": [24.0, 32.5, 45.0, 16.5, 77.0, 450.0]
         })
-        st.bar_chart(pipeline_lengths.set_index("Water Sector / Village"), color="#EF4444")
+        st.bar_chart(pipeline_lengths.set_index("Water Sector"), color="#EF4444")
 
     st.markdown("---")
     col_g3, col_g4 = st.columns(2)
-
     with col_g3:
         st.markdown("#### ⚖️ Official Portal vs. Mirror Site Valuation (Tender T42)")
         st.caption("Side-by-side comparison revealing the ₹70 Lakh variance")
@@ -228,15 +221,15 @@ with tabs[2]:
         st.markdown("#### 🧮 Electrical Budget: Stated Total vs. Actual Sum")
         st.caption("Visualizing the ₹40 Lakh addition discrepancy")
         math_df = pd.DataFrame({
-            "Calculation": ["What the Slide Claimed", "Actual Mathematical Sum (80.90 + 185.22)"],
+            "Calculation": ["What the Slide Claimed", "Actual Sum (80.90 + 185.22)"],
             "Total (₹ Crores)": [265.72, 266.12]
         })
         st.bar_chart(math_df.set_index("Calculation"), color="#F59E0B")
 
 # ---------------------------------------------------------
-# TAB 4: MARATHI ↔ ENGLISH LINKER
+# VIEW 4: MARATHI ↔ ENGLISH LINKER
 # ---------------------------------------------------------
-with tabs[3]:
+elif "4. Marathi ↔ English" in view_selection:
     st.subheader("Bilingual Entity Linking: Bridging Marathi Books & English Tenders")
     st.markdown(
         "Municipal budget books in Maharashtra are printed in **Marathi**, but online tenders are published in **English**. "
@@ -245,7 +238,6 @@ with tabs[3]:
 
     with db._get_connection() as conn:
         links_data = pd.read_sql("SELECT * FROM entity_links", conn)
-        tenders_data = pd.read_sql("SELECT tender_id, title, value_inr FROM tenders", conn)
         budget_data = pd.read_sql("SELECT budget_head_code, description_marathi, amount_inr_crore FROM budget_lines", conn)
 
     st.markdown("#### ✅ Validated Cross-Language Links")
@@ -255,9 +247,9 @@ with tabs[3]:
     st.dataframe(budget_data, width="stretch")
 
 # ---------------------------------------------------------
-# TAB 5: LIVE PORTAL CRAWLER TEST
+# VIEW 5: LIVE PUBLIC PORTAL INGESTION
 # ---------------------------------------------------------
-with tabs[4]:
+else:
     st.subheader("Live Government Portal Ingestion")
     st.markdown(
         "Click below to test live HTTP acquisition from public portals. "
@@ -302,7 +294,7 @@ with tabs[4]:
             c3.metric("Digital Fingerprint (SHA-256)", f"{res.content_hash[:16]}...")
 
             st.markdown("#### 📄 Real Data Extracted from Public Page:")
-            st.text_area("Live Extracted HTML / Text:", res.payload_preview, height=220)
+            st.text_area("Live Extracted HTML / Text:", res.payload_preview, height=200)
 
     st.markdown("---")
     st.subheader("🔒 Tamper-Proof Audit Check")
