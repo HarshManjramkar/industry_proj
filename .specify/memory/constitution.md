@@ -108,9 +108,23 @@
 
 ---
 
-## Tooling & Verification Oracles in This Repository
-- **Verification Runner:** `.bin/verify-pipeline` executes:
-  - `.bin/semgrep-runner` (AST security & rule validation)
-  - `.bin/sentrux-runner` (Modularity, circular dependency prevention, God-file avoidance)
-  - Pre-seeded test runners (`pytest`, `vitest`, or runner of choice)
-- **Memory & Invariants:** Kept in `.specify/memory/constitution.md` and referenced across all sessions.
+## Integration with BMad v7 Architecture, TEA & CIS
+
+### BMad v7 Working Philosophy
+BMad v7 introduces **Agent-as-Code**, decoupled modular suites, and first-class execution guardrails. In this repository, v7 operates under strict mechanical subordination to the Devang Manjramkar Flow:
+1. **Decoupled Architecture**: Planning, verification, implementation, and quality auditing are separated into specialized modules (`bmm`, `bmb`, `tea`, `cis`).
+2. **Deterministic Context**: Agents never inspect raw code without first loading their associated story file, schema contracts, and oracle tests.
+
+### TEA (Test Engineering Architect — Murat) Integration
+- Installed via `bmad-tea` and configured into the Verification Layer (Stage 3) and Proof & Feedback (Stage 5).
+- **Core Responsibilities:**
+  - **ATDD (Acceptance Test-Driven Development):** Enforces Given/When/Then acceptance criteria before dev implementation.
+  - **Risk-Based Quality Gates:** Validates coverage, flakiness elimination, and contract integrity across API boundaries.
+  - **Traceability Matrix (`bmad-testarch-trace`):** Maps every functional requirement in the PRD directly to a verifiable test case.
+
+### CIS (Creative Innovation Suite) Integration
+- Installed via `bmad-cis` and deployed in **Adversarial Verification** (Stage 5, Sticky Note 3) and Requirement Analysis (Stage 2).
+- **Core Responsibilities:**
+  - **Adversarial Edge Discovery:** Uses creative problem-solving and red-teaming lenses to challenge assumption models (e.g., malformed Marathi transliterations, abnormal Indian rupee denominations, mirror data delays).
+  - **Invariant Stress Testing:** Formulates unexpected edge cases to break the reconciliation rules before release.
+
