@@ -55,19 +55,13 @@ st.set_page_config(page_title="PMC Civic Reconciliation | Pune", page_icon="🏛
 st.markdown(get_theme_css(), unsafe_allow_html=True)
 
 # -------------------------------------------------------------------
-# CINEMATIC MOVIE-STYLE INTRO ON LOAD
+# CINEMATIC MOVIE INTRO OVERLAY (5s Auto-Fade / Click-Anywhere Skip)
 # -------------------------------------------------------------------
-if "intro_completed" not in st.session_state:
-    st.session_state.intro_completed = False
+if "show_intro_overlay" not in st.session_state:
+    st.session_state.show_intro_overlay = True
 
-if not st.session_state.intro_completed:
+if st.session_state.show_intro_overlay:
     st.markdown(render_cinematic_intro_html(), unsafe_allow_html=True)
-    b_col1, b_col2, b_col3 = st.columns([0.25, 0.50, 0.25])
-    with b_col2:
-        if st.button("⚔️ ENTER FORENSIC COMMAND CENTER", type="primary", width="stretch"):
-            st.session_state.intro_completed = True
-            st.rerun()
-    st.stop()
 
 # -------------------------------------------------------------------
 # COMMAND CENTER COCKPIT
@@ -95,7 +89,7 @@ with nav_c1:
     )
 with nav_c2:
     if st.button("🎬 Movie Intro", width="stretch"):
-        st.session_state.intro_completed = False
+        st.session_state.show_intro_overlay = True
         st.rerun()
 
 PANE_HEIGHT = 580
